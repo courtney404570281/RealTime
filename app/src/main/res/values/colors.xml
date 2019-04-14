@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ECA72C</color>
+    <color name="colorPrimaryDark">#EFB752</color>
+    <color name="colorAccent">#F4E285</color>
+    <color name="line">#5B8E7D</color>
+    <color name="waiting">#5DAC81</color>
+    <color name="plateNumb">#E7A53E</color>
+    <color name="arriving">#C73E3A</color>
+    <color name="white">#fff</color>
+    <color name="name">#E0E1DE</color>
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <ImageView
+            android:id="@+id/img_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            app:srcCompat="@drawable/plane"
+    />
+
+    <TextView
+            android:id="@+id/txt_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="10dp"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:layout_gravity="bottom|right"
+            android:paddingRight="10dp"
+            android:text="飛機 Plane"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/name"
+            android:textSize="36sp"
+            android:textStyle="bold" android:gravity="right"/>
+
+</androidx.cardview.widget.CardView>
