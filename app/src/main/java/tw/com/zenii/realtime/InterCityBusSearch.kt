@@ -1,18 +1,23 @@
 package tw.com.zenii.realtime
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SearchView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_inter_city_bus_search.*
 import java.util.*
 
 class InterCityBusSearch : AppCompatActivity() {
+
+    val TAG = InterCityBusSearch::class.java.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,9 +84,36 @@ class InterCityBusSearch : AppCompatActivity() {
                     }
 
                     runOnUiThread {
+                        if(routeNameResults.isEmpty()){
+                            AlertDialog.Builder(this@InterCityBusSearch)
+                                .setTitle(getString(R.string.message))
+                                .setMessage(subRouteId + "\t" + getString(R.string.not_found))
+                                .setPositiveButton(getString(R.string.search_others), { dialog, which ->
+                                    search.setQuery("", false)
+                                    search.isIconified()
+                                })
+                                .show()
+                        }
+
                         val adapter =
                             ArrayAdapter(this@InterCityBusSearch, android.R.layout.simple_list_item_1, routeNameResults)
                         list.setAdapter(adapter)
+                        var itemListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+                            var type = routeIdResults.get(position).substring(4)
+                            var route = routeIdResults.get(position).substring(0, 4)
+                            if (type.equals("")) {
+                                route += "0"
+                            } else {
+                                route = routeIdResults.get(position).substring(0, 5)
+                            }
+                            Log.d(TAG, "itemListener: $route")
+
+                            val intent = Intent(this@InterCityBusSearch, MapsActivity::class.java)
+                            intent.putExtra("route", route)
+                            startActivity(intent)
+
+                        }
+                        list.onItemClickListener = itemListener
 
                     }
                 }

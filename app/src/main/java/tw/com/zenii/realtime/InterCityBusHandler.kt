@@ -1,5 +1,6 @@
 package tw.com.zenii.realtime
 
+import android.content.ContentValues.TAG
 import android.util.Log
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -14,7 +15,7 @@ class InterCityBusHandler {
         val mongo = Mongo()
 
         val result = mongo.call("getRouteSearchResult", key) ?: return jaToReturn
-        Log.d("result", result)
+        //Log.d("result", result)
         val resObj = JsonParser().parse(result!!).getAsJsonObject()
 
         // build jaToReturn here
@@ -26,6 +27,7 @@ class InterCityBusHandler {
             if (/*subRouteName.length() == 5 && */subRouteName.substring(4, 5) == "0") {
                 subRouteName = subRouteName.substring(0, 4)
             }
+            Log.d(TAG, "subRouteName: ${subRouteName}")
             val headsign = subRouteObj.get("Headsign").getAsString()
             if (!subRouteNamesGotten.contains(subRouteName)) {
                 subRouteNamesGotten.add(subRouteName)

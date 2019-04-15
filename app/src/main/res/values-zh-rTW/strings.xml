@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">即時公車狀態</string>
+    <string name="action_settings">設定</string>
+    <string name="please_enter_the_route">請輸入路線</string>
+    <string name="title_activity_maps">地圖</string>
+    <string name="bus">公車</string>
+    <string name="plane">飛機</string>
+    <string name="bike">自行車</string>
+    <string name="railway">台鐵</string>
+    <string name="message">訊息</string>
+    <string name="not_found">查無此車</string>
+    <string name="search_others">找找別路</string>
+</resources>

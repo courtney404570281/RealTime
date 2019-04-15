@@ -17,10 +17,10 @@ import tw.com.zenii.realtime.category.CategoryAdapter
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     var catogories = mutableListOf(
-        Category("Bus", R.drawable.bus),
-        Category("Plane", R.drawable.plane),
-        Category("Bike", R.drawable.bike),
-        Category("Railway", R.drawable.train)
+        Category(getString(R.string.bus), R.drawable.bus),
+        Category(getString(R.string.plane), R.drawable.plane),
+        Category(getString(R.string.bike), R.drawable.bike),
+        Category(getString(R.string.railway), R.drawable.train)
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

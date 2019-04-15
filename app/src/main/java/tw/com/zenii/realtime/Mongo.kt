@@ -34,6 +34,10 @@ class Mongo {
             e.printStackTrace()
         } catch (e: XmlPullParserException) {
             e.printStackTrace()
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+        } catch (e: TypeCastException) {
+            e.printStackTrace()
         }
 
         return response?.toString()
