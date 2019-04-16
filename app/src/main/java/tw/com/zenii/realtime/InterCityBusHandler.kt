@@ -143,4 +143,40 @@ class InterCityBusHandler {
         }
         return plateNumb
     }
+
+    // 預計到站時間
+    fun getEstimateTime(subRouteId: String): List<String> {
+        val estimateTimes = ArrayList<String>()
+
+        val results = mongo.call("getEstimated", subRouteId) ?: return estimateTimes
+        val ja = JsonParser().parse(results!!).asJsonArray
+
+        for (je in ja) {
+            val jsonObject = je.asJsonObject
+            var estimateTime = "未發車"
+            if (jsonObject.has("EstimateTime")) {
+                estimateTime = "${jsonObject.get("EstimateTime").asInt / 60}  min"
+            }
+            estimateTimes.add(estimateTime)
+        }
+
+        return estimateTimes
+    }
+
+    // 預計到站之站牌名稱
+    fun getStopNames(subRouteId: String): List<String> {
+        val stopNames = ArrayList<String>()
+
+        val results = mongo.call("getEstimated", subRouteId) ?: return stopNames
+        val ja = JsonParser().parse(results!!).asJsonArray
+
+        for (je in ja) {
+            val res = je.asJsonObject
+            val stop = res.get("StopName").asJsonObject
+            val tw = stop.asJsonObject
+                .get("Zh_tw").asString
+            stopNames.add(tw)
+        }
+        return stopNames
+    }
 }
