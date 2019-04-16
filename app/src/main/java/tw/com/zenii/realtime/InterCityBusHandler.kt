@@ -6,37 +6,141 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import java.util.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.gson.JsonElement
+
+
+
 
 class InterCityBusHandler {
+
+    val mongo = Mongo()
 
     fun getRouteSearchResult(key: String): JsonArray {
         val jaToReturn = JsonArray()
         val subRouteNamesGotten = ArrayList<String>()
-        val mongo = Mongo()
 
         val result = mongo.call("getRouteSearchResult", key) ?: return jaToReturn
         //Log.d("result", result)
-        val resObj = JsonParser().parse(result!!).getAsJsonObject()
+        val resObj = JsonParser().parse(result!!).asJsonObject
 
         // build jaToReturn here
-        val subRoutes = resObj.get("SubRoutes").getAsJsonArray()
+        val subRoutes = resObj.get("SubRoutes").asJsonArray
         for (subRoute in subRoutes) {
             val joToAdd = JsonObject()
-            val subRouteObj = subRoute.getAsJsonObject()
-            var subRouteName = subRouteObj.get("SubRouteName").getAsJsonObject().get("Zh_tw").getAsString()
+            val subRouteObj = subRoute.asJsonObject
+            var subRouteName = subRouteObj.get("SubRouteName").asJsonObject.get("Zh_tw").asString
             if (/*subRouteName.length() == 5 && */subRouteName.substring(4, 5) == "0") {
                 subRouteName = subRouteName.substring(0, 4)
             }
-            Log.d(TAG, "subRouteName: ${subRouteName}")
-            val headsign = subRouteObj.get("Headsign").getAsString()
+            Log.d(TAG, "subRouteName: $subRouteName")
+            val headSign = subRouteObj.get("Headsign").asString
             if (!subRouteNamesGotten.contains(subRouteName)) {
                 subRouteNamesGotten.add(subRouteName)
                 joToAdd.addProperty("SubRouteID", subRouteName)
-                joToAdd.addProperty("Headsign", headsign)
+                joToAdd.addProperty("Headsign", headSign)
                 jaToReturn.add(joToAdd)
             }
         }
 
         return jaToReturn
+    }
+
+    // 取得站牌位置
+    fun getStopPosition(subRouteId: String): List<LatLng> {
+        var lat: Double
+        var lng: Double
+        val stopPositions = ArrayList<LatLng>()
+
+        val results = mongo.call("getStopOfRoute", subRouteId) ?: return stopPositions
+        val ja = JsonParser().parse(results!!).asJsonArray
+
+        for (je in ja) {
+            val res = je.asJsonObject
+            val stops = res.get("Stops").asJsonArray
+            for (stop in stops) {
+                lat = stop.asJsonObject
+                    .get("StopPosition").asJsonObject
+                    .get("PositionLat").asDouble
+                lng = stop.asJsonObject
+                    .get("StopPosition").asJsonObject
+                    .get("PositionLon").asDouble
+                stopPositions.add(LatLng(lat, lng))
+            }
+        }
+        return stopPositions
+    }
+
+    // 取得站牌名稱（搭配經緯度）
+    fun getStopName(subRouteId: String): Map<LatLng, String> {
+        var lat: Double
+        var lng: Double
+        val stopName = HashMap<LatLng, String>()
+        var name: String
+
+        val results = mongo.call("getStopOfRoute", subRouteId) ?: return stopName
+        val ja = JsonParser().parse(results!!).asJsonArray
+
+        for (je in ja) {
+            val res = je.asJsonObject
+            val stops = res.get("Stops").asJsonArray
+            for (stop in stops) {
+                lat = stop.asJsonObject
+                    .get("StopPosition").asJsonObject
+                    .get("PositionLat").asDouble
+                lng = stop.asJsonObject
+                    .get("StopPosition").asJsonObject
+                    .get("PositionLon").asDouble
+                name = stop.asJsonObject
+                    .get("StopName").asJsonObject
+                    .get("Zh_tw").asString
+                stopName[LatLng(lat, lng)] = name
+            }
+        }
+        return stopName
+    }
+
+    // 取得公車位置
+    fun getBusPosition(subRouteId: String): List<LatLng> {
+        var lat: Double
+        var lng: Double
+        val busPositions = ArrayList<LatLng>()
+
+        val results = mongo.call("getFrequency", subRouteId) ?: return busPositions
+        val ja = JsonParser().parse(results!!).asJsonArray
+
+        for (je in ja) {
+            val res = je.asJsonObject
+            val stops = res.get("BusPosition").asJsonObject
+            lat = stops.asJsonObject
+                .get("PositionLat").asDouble
+            lng = stops.asJsonObject
+                .get("PositionLon").asDouble
+            busPositions.add(LatLng(lat, lng))
+        }
+        return busPositions
+    }
+
+    // 取得車牌號碼（搭配經緯度）
+    fun getPlateNumb(subRouteId: String): Map<LatLng, String> {
+        var lat: Double
+        var lng: Double
+        val plateNumb = HashMap<LatLng, String>()
+        var numb: String
+
+        val results = mongo.call("getFrequency", subRouteId) ?: return plateNumb
+        val ja = JsonParser().parse(results!!).asJsonArray
+
+        for (je in ja) {
+            val res = je.asJsonObject
+            val stops = res.get("BusPosition").asJsonObject
+            numb = res.get("PlateNumb").asString
+            lat = stops.asJsonObject
+                .get("PositionLat").asDouble
+            lng = stops.asJsonObject
+                .get("PositionLon").asDouble
+            plateNumb[LatLng(lat, lng)] = numb
+        }
+        return plateNumb
     }
 }
