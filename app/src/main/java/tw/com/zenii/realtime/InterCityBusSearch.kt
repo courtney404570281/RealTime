@@ -7,12 +7,20 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
+import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.Constraints
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_inter_city_bus_search.*
+import kotlinx.android.synthetic.main.fragment_go.view.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import tw.com.zenii.realtime.tab.Arrival
+import tw.com.zenii.realtime.tab.ArrivalAdapter
 import java.util.*
 
 class InterCityBusSearch : AppCompatActivity() {
@@ -24,7 +32,7 @@ class InterCityBusSearch : AppCompatActivity() {
         setContentView(R.layout.activity_inter_city_bus_search)
 
         // 在 searchView 內取值
-        search.setQueryHint(getString(R.string.please_enter_the_route))
+        search.queryHint = getString(R.string.please_enter_the_route)
         search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String): Boolean {
@@ -50,7 +58,10 @@ class InterCityBusSearch : AppCompatActivity() {
             }
 
         })
+
+
     }
+
 
     inner class MongoRunnable : Runnable {
 

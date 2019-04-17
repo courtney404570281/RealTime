@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.Constraints
 import androidx.viewpager.widget.ViewPager
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -16,11 +17,13 @@ import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import tw.com.zenii.realtime.tab.Arrival
 import tw.com.zenii.realtime.tab.GoFragment
 import tw.com.zenii.realtime.tab.PagerAdapter
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -31,7 +34,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     // 變數
     //val route = intent.getStringExtra("route") // 1818A 傳入 Map 的值
     private var mapRoute = "181801" // 1818A1
-    var tabRoute = "1818A" // 傳進 tab 是 1818A 傳出 tab 是 1818A1
+    var tabRoute: String = "1818A" // 傳進 tab 是 1818A 傳出 tab 是 1818A1
 
     // 常數
     private val TAG = MapsActivity::class.java.simpleName
@@ -56,7 +59,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 markBus()
             }
             // 測試 10s
-            Log.d("Time", Date().toString())
+            Log.d(TAG, "MapsActivityTimer: ${Date()}")
         }, 0, 10, TimeUnit.SECONDS)
 
         // 繪製地圖
@@ -64,20 +67,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // 繪製 Tabs
         setupViewPager(pager as ViewPager)
+
     }
 
     // 設定 ViewPager
     private fun setupViewPager(viewPager: ViewPager) {
-        val page = 2
-        val fragmentAdapter = PagerAdapter(supportFragmentManager)
-        for(i in 1..page) {
-            //fragmentAdapter.addFragment(GoFragment.instance, "Go")
-            fragmentAdapter.addFragment(GoFragment(), "Go")
+        GlobalScope.launch {
+            // 確認是否有來回
+            val title = ArrayList<String>()
+            title.add("往 A 地")
+            title.add("往 B 地")
+            runOnUiThread {
+                val fragmentAdapter = PagerAdapter(supportFragmentManager)
+                for(i in 0 until title.size) {
+                    fragmentAdapter.addFragment(GoFragment(), title[i])
+                }
+                viewPager.adapter = fragmentAdapter
+            }
         }
-        /*fragmentAdapter.addFragment(GoFragment(), "Go")
-        fragmentAdapter.addFragment(BackFragment(), "Back")*/
-
-        viewPager.adapter = fragmentAdapter
     }
 
     // 初始地圖設定

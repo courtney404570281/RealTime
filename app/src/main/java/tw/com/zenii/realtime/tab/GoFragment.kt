@@ -13,10 +13,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import tw.com.zenii.realtime.InterCityBusHandler
 import tw.com.zenii.realtime.R
+import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
-class GoFragment: Fragment() {
+class GoFragment : Fragment() {
 
-    companion object{
+    companion object {
         val instance: GoFragment by lazy {
             GoFragment()
         }
@@ -31,9 +34,16 @@ class GoFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        GlobalScope.launch {
-            listStop(view)
-        }
+
+        // 每 10 秒更新一次資料
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
+            GlobalScope.launch {
+                listStop(view)
+            }
+            // 測試 10s
+            Log.d(TAG, "GoFragmentTimer: ${Date()}")
+        }, 0, 10, TimeUnit.SECONDS)
+
     }
 
     // 列出所有站牌與到站時間

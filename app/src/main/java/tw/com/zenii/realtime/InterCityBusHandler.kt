@@ -8,14 +8,14 @@ import com.google.gson.JsonParser
 import java.util.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.JsonElement
-
-
+import kotlin.collections.ArrayList
 
 
 class InterCityBusHandler {
 
     val mongo = Mongo()
 
+    // 取得搜尋結果
     fun getRouteSearchResult(key: String): JsonArray {
         val jaToReturn = JsonArray()
         val subRouteNamesGotten = ArrayList<String>()
