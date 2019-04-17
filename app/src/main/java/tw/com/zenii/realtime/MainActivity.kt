@@ -16,11 +16,12 @@ import tw.com.zenii.realtime.category.CategoryAdapter
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    // 各種交通工具列表
     var catogories = mutableListOf(
-        Category(getString(R.string.bus), R.drawable.bus),
-        Category(getString(R.string.plane), R.drawable.plane),
-        Category(getString(R.string.bike), R.drawable.bike),
-        Category(getString(R.string.railway), R.drawable.train)
+        Category(getString(R.string.bus), R.drawable.bus), // 客運
+        Category(getString(R.string.plane), R.drawable.plane), // 飛機
+        Category(getString(R.string.bike), R.drawable.bike), // 自行車
+        Category(getString(R.string.railway), R.drawable.train) // 火車
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,12 +37,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nav_view.setNavigationItemSelectedListener(this)
 
+        // RecyclerView 之 Adapter
         setAdapter()
-    }
-
-    private fun setAdapter() {
-        recyclerView.adapter = CategoryAdapter(this, catogories)
-        recyclerView.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onBackPressed() {
@@ -53,26 +50,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
         return true
     }
 
+    // 設定（右上角）設定
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
-            R.id.action_settings -> return true
-            else -> return super.onOptionsItemSelected(item)
+        return when (item.itemId) {
+            R.id.action_settings -> true
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
+    // 設定選單
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
+
         when (item.itemId) {
             R.id.nav_camera -> {
-                // Handle the camera action
+
             }
             R.id.nav_gallery -> {
 
@@ -93,5 +88,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    // 設定 RecyclerView 之 Adapter
+    private fun setAdapter() {
+        recyclerView.adapter = CategoryAdapter(this, catogories)
+        recyclerView.layoutManager = LinearLayoutManager(this)
     }
 }
