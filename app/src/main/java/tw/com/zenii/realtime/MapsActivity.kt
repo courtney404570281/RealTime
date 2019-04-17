@@ -71,6 +71,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val page = 2
         val fragmentAdapter = PagerAdapter(supportFragmentManager)
         for(i in 1..page) {
+            //fragmentAdapter.addFragment(GoFragment.instance, "Go")
             fragmentAdapter.addFragment(GoFragment(), "Go")
         }
         /*fragmentAdapter.addFragment(GoFragment(), "Go")
