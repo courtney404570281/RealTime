@@ -32,18 +32,27 @@ class GoFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         GlobalScope.launch {
-            val stopName = handler.getStopNames(tabRoute)
-            val estimateTime = handler.getEstimateTime(tabRoute)
-            activity?.runOnUiThread{
-                for(i in 0 until estimateTime.size) {
-                    arrivals.add(Arrival(estimateTime[i], stopName[i]))
-                    Log.d(TAG, "runOnUiThread: ${estimateTime[i]} ${stopName[i]}")
-                }
-                setAdapter(view)
-            }
+            listStop(view)
         }
     }
 
+    // 列出所有站牌與到站時間
+    private fun listStop(view: View) {
+        // 各站站牌名稱
+        val stopName = handler.getStopNames(tabRoute)
+        // 預計到站之時間
+        val estimateTime = handler.getEstimateTime(tabRoute)
+        activity?.runOnUiThread {
+            for (i in 0 until estimateTime.size) {
+                arrivals.add(Arrival(estimateTime[i], stopName[i]))
+                Log.d(TAG, "runOnUiThread: ${estimateTime[i]} ${stopName[i]}")
+            }
+            // 繪製 RecyclerView
+            setAdapter(view)
+        }
+    }
+
+    // 繪製 RecyclerView
     private fun setAdapter(view: View) {
         // 設定 RecyclerView 之 Adapter
         view?.recyclerView_go?.adapter = ArrivalAdapter(this!!.activity!!, arrivals)
