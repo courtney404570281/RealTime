@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import tw.com.zenii.realtime.R
 
-class CategoryAdapter (val context: Context, val category: List<Category>) :
+class CategoryAdapter (val context: Context, val category: MutableList<Category>) :
     RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
