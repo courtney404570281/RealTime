@@ -1,5 +1,5 @@
 package tw.com.zenii.realtime.tab
 
-class Arrival(val nearStop: String, val stopName: String) {
+class Arrival(val estimateTime: String, val stopName: String) {
 
 }
