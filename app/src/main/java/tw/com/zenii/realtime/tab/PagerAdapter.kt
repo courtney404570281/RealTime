@@ -10,6 +10,11 @@ class PagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm){
     private val mFragmentTitleList = ArrayList<String>()
 
     override fun getItem(position: Int): Fragment {
+
+        if (mFragmentList[position] == null) {
+            mFragmentList.add(position, mFragmentList[position])
+        }
+
         return mFragmentList[position]
     }
 
