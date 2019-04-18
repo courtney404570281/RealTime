@@ -54,7 +54,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
          // 設定地圖
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
-        
+
         // 每 10 秒更新一次資料
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
             GlobalScope.launch {
