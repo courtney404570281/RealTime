@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+
+        <shape android:shape="rectangle"
+        > //指定形狀類型，默認為rectangle
+
+            <solid android:color="@color/white" /> //指定形狀的填充色
+
+            <padding
+                    android:bottom="5dp"
+                    android:left="10dp"
+                    android:right="10dp"
+                    android:top="5dp" /> //設定內容區域離邊界的間距
+
+            <corners android:radius="6dp" /> //設定圓角，只適用於 rectangle
+
+            <stroke
+                    android:width="2.5dp"
+                    android:color="@color/waiting"
+            /> //設定描邊
+        </shape>
+
+    </item>
+</layer-list>

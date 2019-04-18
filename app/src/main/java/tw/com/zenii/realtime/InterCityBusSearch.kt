@@ -7,21 +7,19 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
-import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.Constraints
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_inter_city_bus_search.*
-import kotlinx.android.synthetic.main.fragment_go.view.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import tw.com.zenii.realtime.tab.Arrival
-import tw.com.zenii.realtime.tab.ArrivalAdapter
+import tw.com.zenii.realtime.tracker.Tracker
+import tw.com.zenii.realtime.tracker.TrackerAdapter
 import java.util.*
+import androidx.recyclerview.widget.RecyclerView
+import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener
+
 
 class InterCityBusSearch : AppCompatActivity() {
 
@@ -59,6 +57,50 @@ class InterCityBusSearch : AppCompatActivity() {
 
         })
 
+        // 追蹤清單
+        var tracker_list = mutableListOf(
+            Tracker("捷運大橋頭站", "FT-707", "客滿", "離站", "9001"),
+            Tracker("捷運大橋頭站", "FT-706", "客滿", "離站", "9001"),
+            Tracker("捷運大橋頭站", "FT-705", "客滿", "離站", "9001"),
+            Tracker("捷運大橋頭站", "FT-704", "客滿", "離站", "9001")
+        )
+
+        recyclerView_tracker.layoutManager = LinearLayoutManager(this)
+        recyclerView_tracker.adapter = TrackerAdapter(this, tracker_list)
+
+        // CardView 滑動刪除項目
+        val swipeTouchListener = SwipeableRecyclerViewTouchListener(recyclerView_tracker,
+            object: SwipeableRecyclerViewTouchListener.SwipeListener {
+                override fun canSwipeLeft(position: Int): Boolean {
+                    return true
+                }
+
+                // 向左滑刪除
+                override fun onDismissedBySwipeLeft(recyclerView: RecyclerView, reverseSortedPositions: IntArray) {
+                    for (position in reverseSortedPositions) {
+                        tracker_list.removeAt(position)
+                        recyclerView_tracker.adapter?.notifyItemRemoved(position)
+                    }
+                    recyclerView_tracker.adapter?.notifyDataSetChanged()
+                }
+
+                override fun canSwipeRight(position: Int): Boolean {
+                    return true
+                }
+
+                // 向右滑刪除
+                override fun onDismissedBySwipeRight(recyclerView: RecyclerView, reverseSortedPositions: IntArray) {
+                    for (position in reverseSortedPositions) {
+                        tracker_list.removeAt(position)
+                        recyclerView_tracker.adapter?.notifyItemRemoved(position)
+                    }
+                    recyclerView_tracker.adapter?.notifyDataSetChanged()
+                }
+
+            }
+       )
+
+        recyclerView_tracker.addOnItemTouchListener(swipeTouchListener)
 
     }
 
@@ -99,20 +141,20 @@ class InterCityBusSearch : AppCompatActivity() {
                             AlertDialog.Builder(this@InterCityBusSearch)
                                 .setTitle(getString(R.string.message))
                                 .setMessage(subRouteId + "\t" + getString(R.string.not_found))
-                                .setPositiveButton(getString(R.string.search_others), { dialog, which ->
+                                .setPositiveButton(getString(R.string.search_others)) { dialog, which ->
                                     search.setQuery("", false)
-                                    search.isIconified()
-                                })
+                                    search.isIconified
+                                }
                                 .show()
                         }
 
                         val adapter =
                             ArrayAdapter(this@InterCityBusSearch, android.R.layout.simple_list_item_1, routeNameResults)
-                        list.setAdapter(adapter)
+                        list.adapter = adapter
                         var itemListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-                            var type = routeIdResults.get(position).substring(4)
-                            var route = routeIdResults.get(position).substring(0, 4)
-                            if (type.equals("")) {
+                            var type = routeIdResults[position].substring(4)
+                            var route = routeIdResults[position].substring(0, 4)
+                            if (type == "") {
                                 route += "0"
                             } else {
                                 route = routeIdResults.get(position).substring(0, 5)
@@ -120,7 +162,10 @@ class InterCityBusSearch : AppCompatActivity() {
                             Log.d(TAG, "itemListener: $route")
 
                             val intent = Intent(this@InterCityBusSearch, MapsActivity::class.java)
-                            intent.putExtra("route", route)
+                            // 設定 RouteId 1818
+                            // TODO: 醒來測試
+                            setRouteId(route)
+                            Log.d(TAG, "setRouteId: $route")
                             startActivity(intent)
 
                         }

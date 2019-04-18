@@ -17,7 +17,8 @@ import tw.com.zenii.realtime.category.CategoryAdapter
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     // 各種交通工具列表
-    var catogories = mutableListOf(
+    // TODO: 確認各類交通工具
+    private var catogories = mutableListOf(
         Category(getString(R.string.bus), R.drawable.bus), // 客運
         Category(getString(R.string.plane), R.drawable.plane), // 飛機
         Category(getString(R.string.bike), R.drawable.bike), // 自行車
