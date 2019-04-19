@@ -7,9 +7,9 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.SearchView
+import android.view.MenuItem
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,7 +19,11 @@ import tw.com.zenii.realtime.tracker.TrackerAdapter
 import java.util.*
 import androidx.recyclerview.widget.RecyclerView
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener
-
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import com.arlib.floatingsearchview.FloatingSearchView
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
+import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter
 
 class InterCityBusSearch : AppCompatActivity() {
 

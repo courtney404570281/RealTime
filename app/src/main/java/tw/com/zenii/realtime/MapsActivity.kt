@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.constraintlayout.widget.Constraints
 import androidx.viewpager.widget.ViewPager
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -16,9 +15,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import tw.com.zenii.realtime.tab.Arrival
 import tw.com.zenii.realtime.tab.GoFragment
 import tw.com.zenii.realtime.tab.PagerAdapter
 import java.util.*
@@ -39,6 +36,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private val DEFAULTE_ZOOM = 10.0f // 初始鏡頭
     private val LINE_WIDTH = 7.0f // 地圖上之線寬
     private var first = true
+    private var once = true
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +49,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // 設定狀態條之背景色
         window.statusBarColor = Color.rgb(236, 167, 44)
 
-         // 設定地圖
+        // 設定地圖
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
 
@@ -110,6 +108,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     1 -> setMapRouteId(route + "2")
                 }
                 Log.d(TAG, "setMapRouteId: ${getMapRouteId()}")
+                once = true
+                initiateCamera()
+                markers()
             }
 
         }
@@ -132,12 +133,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // 初始鏡頭
     private fun initiateCamera() {
-        // 站牌所在位置之經緯度
-        val stopPositions = handler.getStopPosition(getMapRouteId())
-        runOnUiThread {
-            // 鏡頭初始位置
-            if (stopPositions.isNotEmpty()){
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(stopPositions[0], DEFAULTE_ZOOM))
+
+        GlobalScope.launch {
+            // 站牌所在位置之經緯度
+            val stopPositions = handler.getStopPosition(getMapRouteId())
+            runOnUiThread {
+                // 鏡頭初始位置
+                if (stopPositions.isNotEmpty() && once){
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(stopPositions[0], DEFAULTE_ZOOM))
+                    once = false
+                }
             }
         }
     }
@@ -145,31 +150,33 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     // 標示地圖上之各站站牌
     private fun markStops() {
 
-        // 站牌所在位置之經緯度
-        val stopPositions = handler.getStopPosition(getMapRouteId())
-        // 各站站名
-        val stopNames = handler.getStopName(getMapRouteId())
+        GlobalScope.launch {
+            // 站牌所在位置之經緯度
+            val stopPositions = handler.getStopPosition(getMapRouteId())
+            // 各站站名
+            val stopNames = handler.getStopName(getMapRouteId())
 
-        runOnUiThread {
+            runOnUiThread {
 
-            // 站牌位置 Stop Markers
-            for (i in 0 until stopPositions.size) {
-                mMap.addMarker(
-                    MarkerOptions()
-                        .position(stopPositions[i])
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_bus_stop))
-                        .title(stopNames[stopPositions[i]])
-                )
-            }
+                // 站牌位置 Stop Markers
+                for (i in 0 until stopPositions.size) {
+                    mMap.addMarker(
+                        MarkerOptions()
+                            .position(stopPositions[i])
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_bus_stop))
+                            .title(stopNames[stopPositions[i]])
+                    )
+                }
 
-            // 劃線的地方 PolyLine Of Stops
-            for (i in 0 until stopPositions.size - 1) {
-                mMap.addPolyline(
-                    PolylineOptions()
-                        .addAll(stopPositions)
-                        .color(Color.rgb(91, 142, 125))
-                        .width(LINE_WIDTH)
-                )
+                // 劃線的地方 PolyLine Of Stops
+                for (i in 0 until stopPositions.size - 1) {
+                    mMap.addPolyline(
+                        PolylineOptions()
+                            .addAll(stopPositions)
+                            .color(Color.rgb(91, 142, 125))
+                            .width(LINE_WIDTH)
+                    )
+                }
             }
         }
     }
@@ -177,25 +184,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     // 標示地圖上行駛中之客運
     private fun markBus() {
 
-        // 客運目前所在之經緯度
-        val busPositions = handler.getBusPosition(getMapRouteId())
-        // 客運之車牌號碼
-        val plateNumbs = handler.getPlateNumb(getMapRouteId())
+        GlobalScope.launch {
+            // 客運目前所在之經緯度
+            val busPositions = handler.getBusPosition(getMapRouteId())
+            // 客運之車牌號碼
+            val plateNumbs = handler.getPlateNumb(getMapRouteId())
 
-        runOnUiThread {
+            runOnUiThread {
 
-            // 客運現在位置 Bus Marker
-            for (i in 0 until busPositions.size) {
+                // 客運現在位置 Bus Marker
+                for (i in 0 until busPositions.size) {
 
-                Log.d(TAG, "busPosition : ${busPositions[i]}")
+                    Log.d(TAG, "busPosition : ${busPositions[i]}")
 
-                mMap.addMarker(
-                    MarkerOptions()
-                        .position(busPositions[i])
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_bus))
-                        .title(plateNumbs[busPositions[i]])
-                )
+                    mMap.addMarker(
+                        MarkerOptions()
+                            .position(busPositions[i])
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_bus))
+                            .title(plateNumbs[busPositions[i]])
+                    )
 
+                }
             }
         }
     }

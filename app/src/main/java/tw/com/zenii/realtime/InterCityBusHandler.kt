@@ -181,4 +181,12 @@ class InterCityBusHandler {
         }
         return stopNames
     }
+
+    // test
+    fun getTest(): List<String> {
+        val test = ArrayList<String>()
+        val results = mongo.call("getRealRoute", "test") ?: return test
+
+        return test
+    }
 }

@@ -36,7 +36,7 @@ class GoFragment : Fragment() {
             listStop(view)
             // 測試 10s
             Log.d(TAG, "GoFragmentTimer: ${Date()}")
-        }, 0, 5, TimeUnit.SECONDS)
+        }, -10, 10, TimeUnit.SECONDS)
 
         return view
     }
@@ -45,8 +45,8 @@ class GoFragment : Fragment() {
     private fun listStop(view: View) {
 
         GlobalScope.launch {
-            //val tabRoute = activity!!.getMapRouteId()
-            val tabRoute = "181801"
+            val tabRoute = activity!!.getMapRouteId()
+            //val tabRoute = "181801"
 
             // 各站站牌名稱
             val stopName = handler.getStopNames(tabRoute)
