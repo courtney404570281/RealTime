@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_go.view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.info
+import org.jetbrains.anko.uiThread
 import tw.com.zenii.realtime.InterCityBusHandler
 import tw.com.zenii.realtime.R
 import tw.com.zenii.realtime.getMapRouteId
@@ -18,7 +22,7 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class GoFragment : Fragment() {
+class GoFragment : Fragment() , AnkoLogger {
 
     companion object {
         val instance: GoFragment by lazy {
@@ -31,12 +35,15 @@ class GoFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_go, container, false)
-        // 每 10 秒更新一次資料
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
-            listStop(view)
-            // 測試 10s
-            Log.d(TAG, "GoFragmentTimer: ${Date()}")
-        }, -10, 10, TimeUnit.SECONDS)
+
+        GlobalScope.launch {
+            // 每 1 秒更新一次資料
+            Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
+                listStop(view)
+                // 測試 1s
+                info { "GoFragmentTimer: ${Date()}" }
+            }, 0, 1, TimeUnit.SECONDS)
+        }
 
         return view
     }
@@ -58,12 +65,14 @@ class GoFragment : Fragment() {
                 arrivals.clear()
             }
 
-            for (i in 0 until estimateTime.size) {
-                arrivals.add(Arrival(estimateTime[i], stopName[i]))
-                Log.d(TAG, "runOnUiThread: ${estimateTime[i]} ${stopName[i]}")
+            if (estimateTime.size == stopName.size) {
+                for (i in 0 until estimateTime.size) {
+                    arrivals.add(Arrival(estimateTime[i], stopName[i]))
+                    info { "runOnUiThread: ${estimateTime[i]} ${stopName[i]}" }
+                }
             }
 
-            activity?.runOnUiThread {
+            activity!!.runOnUiThread{
                 // 繪製 RecyclerView
                 setAdapter(view)
             }

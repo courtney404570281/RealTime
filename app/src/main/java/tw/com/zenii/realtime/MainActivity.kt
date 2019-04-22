@@ -1,29 +1,30 @@
 package tw.com.zenii.realtime
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
+import com.pawegio.kandroid.inflateLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.cardview_main.view.*
 import kotlinx.android.synthetic.main.content_main.*
 import tw.com.zenii.realtime.category.Category
 import tw.com.zenii.realtime.category.CategoryAdapter
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
-    // 各種交通工具列表
-    // TODO: 確認各類交通工具
-    private var catogories = mutableListOf(
-        Category(getString(R.string.bus), R.drawable.bus), // 客運
-        Category(getString(R.string.plane), R.drawable.plane), // 飛機
-        Category(getString(R.string.bike), R.drawable.bike), // 自行車
-        Category(getString(R.string.railway), R.drawable.train) // 火車
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         // RecyclerView 之 Adapter
         setAdapter()
+
     }
 
     override fun onBackPressed() {
@@ -93,7 +95,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // 設定 RecyclerView 之 Adapter
     private fun setAdapter() {
+
+        // 各種交通工具列表
+        // TODO: 確認各類交通工具
+        var catogories = mutableListOf(
+            Category(getString(R.string.bus), R.drawable.bus), // 客運
+            Category(getString(R.string.plane), R.drawable.plane), // 飛機
+            Category(getString(R.string.bike), R.drawable.bike), // 自行車
+            Category(getString(R.string.railway), R.drawable.train) // 火車
+        )
+
         recyclerView.adapter = CategoryAdapter(this, catogories)
+        recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
     }
 }

@@ -13,27 +13,30 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.gson.Gson
+import com.pawegio.kandroid.runOnUiThread
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import okhttp3.Route
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 import tw.com.zenii.realtime.tab.GoFragment
 import tw.com.zenii.realtime.tab.PagerAdapter
+import java.net.URL
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
 
     // 設定
     private val handler = InterCityBusHandler()
     private lateinit var mMap: GoogleMap
 
-    val mapRoute = "181801"
-
     // 常數
-    private val TAG = MapsActivity::class.java.simpleName
-    private val DEFAULTE_ZOOM = 10.0f // 初始鏡頭
+    private val DEFAULTE_ZOOM = 14.0f // 初始鏡頭
     private val LINE_WIDTH = 7.0f // 地圖上之線寬
     private var first = true
     private var once = true
@@ -44,7 +47,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
 
         val route = getRouteId() // 1818A 傳入 Map 的值
-        Log.d(TAG, "route: $route")
+        info { "route: $route" }
 
         // 設定狀態條之背景色
         window.statusBarColor = Color.rgb(236, 167, 44)
@@ -53,22 +56,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
 
-        // 每 10 秒更新一次資料
+        // 繪製地圖
+        mapFragment.getMapAsync(this)
+
+        // 每 5 秒更新一次資料
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
             GlobalScope.launch {
                 markers()
             }
-            // 測試 10s
-            Log.d(TAG, "MapsActivityTimer: ${Date()}")
-        }, 100, 5, TimeUnit.SECONDS)
-
-        // 繪製地圖
-        mapFragment.getMapAsync(this)
+            // 測試 5s
+            info { "MapsActivityTimer: ${Date()}" }
+        }, 0, 5, TimeUnit.SECONDS)
 
         // 繪製 Tabs
         setupViewPager(pager as ViewPager)
 
     }
+
 
     // 設定 ViewPager
     private fun setupViewPager(viewPager: ViewPager) {
@@ -107,7 +111,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     0 -> setMapRouteId(route + "1")
                     1 -> setMapRouteId(route + "2")
                 }
-                Log.d(TAG, "setMapRouteId: ${getMapRouteId()}")
+                info{ "setMapRouteId: ${getMapRouteId()}" }
                 once = true
                 initiateCamera()
                 markers()
@@ -195,7 +199,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 // 客運現在位置 Bus Marker
                 for (i in 0 until busPositions.size) {
 
-                    Log.d(TAG, "busPosition : ${busPositions[i]}")
+                    info{ "busPosition : ${busPositions[i]}" }
 
                     mMap.addMarker(
                         MarkerOptions()
@@ -215,12 +219,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         GlobalScope.launch {
             runOnUiThread {
                 Thread.sleep(500L)
-                // 清除目前所有客運
-                mMap.clear()
-
+                if(::mMap.isInitialized){
+                    // 清除目前所有客運
+                    mMap.clear()
+                }
             }
             markStops()
             markBus()
         }
     }
 }
+
+/*
+
+{  "_id" : "test",
+   "PositionPoints" : [[25.0495916666667, 121.511863333333], [25.0495916666667, 121.511863333333],
+   [25.04952, 121.511833333333], [25.0494883333333, 121.511843333333], [25.0494883333333, 121.511843333333],
+    [25.0498483333333, 121.511933333333], [25.05125, 121.511911666667], [25.0524683333333, 121.511828333333]]
+}
+
+ */

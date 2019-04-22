@@ -12,7 +12,8 @@
             android:roundIcon="@drawable/icon_main_bus"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
-            android:usesCleartextTraffic="true">
+            android:usesCleartextTraffic="true"
+    >
 
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
@@ -24,16 +25,16 @@
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity android:name=".InterCityBusSearch">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity
                 android:name=".MainActivity"
                 android:label="@string/app_name"
                 android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 

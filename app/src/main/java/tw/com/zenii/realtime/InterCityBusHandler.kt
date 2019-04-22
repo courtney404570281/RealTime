@@ -11,7 +11,7 @@ import com.google.gson.JsonElement
 import kotlin.collections.ArrayList
 
 
-class InterCityBusHandler {
+class InterCityBusHandler  {
 
     val mongo = Mongo()
 
@@ -183,10 +183,10 @@ class InterCityBusHandler {
     }
 
     // test
-    fun getTest(): List<String> {
+    fun getTest(): String {
         val test = ArrayList<String>()
-        val results = mongo.call("getRealRoute", "test") ?: return test
+        val results = mongo.call("getRealRoute", "test") ?: return ""
 
-        return test
+        return results
     }
 }

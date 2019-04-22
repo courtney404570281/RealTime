@@ -24,42 +24,36 @@ import kotlinx.coroutines.launch
 import com.arlib.floatingsearchview.FloatingSearchView
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
 import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter
+import com.pawegio.kandroid.onQuerySubmit
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.info
 
-class InterCityBusSearch : AppCompatActivity() {
-
-    val TAG = InterCityBusSearch::class.java.simpleName
+class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inter_city_bus_search)
 
+
         // 在 searchView 內取值
         search.queryHint = getString(R.string.please_enter_the_route)
-        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
-            override fun onQueryTextSubmit(query: String): Boolean {
-                Log.d("search", query)
-                val mongoRunnable = MongoRunnable()
-                Thread(mongoRunnable).start()
-                try {
-                    Thread.sleep(500)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
-
-                if (mongoRunnable.handler != null && query != "") {
-                    val msg = Message()
-                    msg.obj = query
-                    mongoRunnable.handler!!.sendMessage(msg)
-                }
-                return false
+            search.onQuerySubmit { query ->
+            info { "search: $query" }
+            val mongoRunnable = MongoRunnable()
+            Thread(mongoRunnable).start()
+            try {
+                Thread.sleep(500)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
             }
 
-            override fun onQueryTextChange(newText: String): Boolean {
-                return false
+            if (mongoRunnable.handler != null && query != "") {
+                val msg = Message()
+                msg.obj = query
+                mongoRunnable.handler!!.sendMessage(msg)
             }
-
-        })
+        }
 
         // 追蹤清單
         var tracker_list = mutableListOf(
@@ -135,10 +129,12 @@ class InterCityBusSearch : AppCompatActivity() {
                         val jo = je.getAsJsonObject()
                         result = jo.get("SubRouteID").getAsString() + "\n" + jo.get("Headsign").getAsString()
                         resultId = jo.get("SubRouteID").getAsString()
-                        Log.d("result", result)
+                        info { "result: $result" }
                         routeNameResults.add(result)
                         routeIdResults.add(resultId)
                     }
+
+                    info { "getTest(): ${interCityBusHandler.getTest()}"  }
 
                     runOnUiThread {
                         if(routeNameResults.isEmpty()){
@@ -163,13 +159,13 @@ class InterCityBusSearch : AppCompatActivity() {
                             } else {
                                 route = routeIdResults.get(position).substring(0, 5)
                             }
-                            Log.d(TAG, "itemListener: $route")
+                            info { "itemListener: $route" }
 
                             val intent = Intent(this@InterCityBusSearch, MapsActivity::class.java)
                             // 設定 RouteId 1818
                             // TODO: 醒來測試
                             setRouteId(route)
-                            Log.d(TAG, "setRouteId: $route")
+                            info { "setRouteId: $route" }
                             startActivity(intent)
 
                         }
