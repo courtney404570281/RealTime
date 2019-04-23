@@ -51,32 +51,34 @@ class GoFragment : Fragment() , AnkoLogger {
     // 列出所有站牌與到站時間
     private fun listStop(view: View) {
 
-        GlobalScope.launch {
-            val tabRoute = activity!!.getMapRouteId()
-            //val tabRoute = "181801"
+            GlobalScope.launch {
+                val tabRoute = activity!!.getMapRouteId()
+                //val tabRoute = "181801"
 
-            // 各站站牌名稱
-            val stopName = handler.getStopNames(tabRoute)
-            // 預計到站之時間
-            val estimateTime = handler.getEstimateTime(tabRoute)
+                // 各站站牌名稱
+                val stopName = handler.getStopNames(tabRoute)
+                // 預計到站之時間
+                val estimateTime = handler.getEstimateTime(tabRoute)
 
-            // 清除所有站牌與預估到站時間資料
-            if (arrivals.isNotEmpty()) {
-                arrivals.clear()
-            }
+                // 清除所有站牌與預估到站時間資料
+                if (arrivals.isNotEmpty()) {
+                    arrivals.clear()
+                }
 
-            if (estimateTime.size == stopName.size) {
-                for (i in 0 until estimateTime.size) {
-                    arrivals.add(Arrival(estimateTime[i], stopName[i]))
-                    info { "runOnUiThread: ${estimateTime[i]} ${stopName[i]}" }
+                if (estimateTime.size == stopName.size) {
+                    for (i in 0 until estimateTime.size) {
+                        arrivals.add(Arrival(estimateTime[i], stopName[i]))
+                        info { "runOnUiThread: ${estimateTime[i]} ${stopName[i]}" }
+                    }
+                }
+
+                if (activity != null) {
+                    activity?.runOnUiThread{
+                        // 繪製 RecyclerView
+                        setAdapter(view)
+                    }
                 }
             }
-
-            activity!!.runOnUiThread{
-                // 繪製 RecyclerView
-                setAdapter(view)
-            }
-        }
     }
 
     // 繪製 RecyclerView

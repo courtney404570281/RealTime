@@ -1,11 +1,16 @@
 package tw.com.zenii.realtime
 
+import android.app.Activity
+import android.app.PendingIntent.getActivity
+import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.viewpager.widget.ViewPager
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -28,6 +33,13 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import com.google.android.gms.maps.model.Marker
+import kotlinx.coroutines.NonCancellable.isCancelled
+import org.jetbrains.anko.db.insert
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.support.v4.viewPager
+import org.jetbrains.anko.toast
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
 
@@ -83,12 +95,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
             title.add("往 A 地")
             title.add("往 B 地")
             runOnUiThread {
-                val fragmentAdapter = PagerAdapter(supportFragmentManager)
-                for(i in 0 until title.size) {
-                    fragmentAdapter.addFragment(GoFragment(), title[i])
-                }
-                viewPager.adapter = fragmentAdapter
-                viewPager.addOnPageChangeListener(onPageChangeListener(getRouteId()))
+
+                    val fragmentAdapter = PagerAdapter(supportFragmentManager)
+                    for(i in 0 until title.size) {
+                        fragmentAdapter.addFragment(GoFragment(), title[i])
+                    }
+                    viewPager.adapter = fragmentAdapter
+                    viewPager.addOnPageChangeListener(onPageChangeListener(getRouteId()))
+
             }
         }
     }
@@ -196,18 +210,63 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
 
             runOnUiThread {
 
+                val busMarkerList = arrayOfNulls<Marker>(busPositions.size)
+
                 // 客運現在位置 Bus Marker
                 for (i in 0 until busPositions.size) {
 
                     info{ "busPosition : ${busPositions[i]}" }
 
-                    mMap.addMarker(
+                    busMarkerList[i] = mMap.addMarker(
                         MarkerOptions()
                             .position(busPositions[i])
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_bus))
                             .title(plateNumbs[busPositions[i]])
                     )
+                }
 
+                mMap!!.setOnMarkerClickListener { marker ->
+
+                    for (i in 0 until busPositions.size) {
+                        if (marker == busMarkerList[i]) {
+                            val trackPlateNumb = plateNumbs[busPositions[i]]
+
+                            AlertDialog.Builder(this@MapsActivity)
+                                .setTitle("是否追蹤此車？")
+                                .setMessage("這台車牌是：$trackPlateNumb")
+                                .setPositiveButton("是", ({ dialog, which ->
+                                    GlobalScope.launch {
+                                        /*val nearStop = handler.getStopName(trackPlateNumb!!)
+                                        val busStatus = handler.getStopName(trackPlateNumb!!)
+                                        val a2EventType = handler.getStopName(trackPlateNumb!!)
+                                        val routeName = handler.getStopName(trackPlateNumb!!)*/
+                                        val trackNearStop = "捷運大橋頭站"
+                                        val trackBusStatus = "客滿"
+                                        val trackA2EventType = "離站"
+                                        val trackRouteName = "1818"
+
+                                        database.use {
+                                            insert("Tracker",
+                                                "nearStop" to trackNearStop,
+                                                "plateNumb" to trackPlateNumb,
+                                                "busStatus" to trackBusStatus,
+                                                "a2EventType" to trackA2EventType,
+                                                "routeName" to trackRouteName
+                                            )
+                                        }
+                                        runOnUiThread {
+                                            val intent = Intent(this@MapsActivity, InterCityBusSearch::class.java)
+                                            intent.putExtra("trackPlateNumb", trackPlateNumb)
+                                            startActivity(intent)
+                                        }
+                                    }
+                                }))
+                                .setNegativeButton("否", null)
+                                .show()
+                        }
+                    }
+
+                    false
                 }
             }
         }
