@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1096713998313",
+    "firebase_url": "https://realtime-618bd.firebaseio.com",
+    "project_id": "realtime-618bd",
+    "storage_bucket": "realtime-618bd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096713998313:android:776d87d3850e4727",
+        "android_client_info": {
+          "package_name": "tw.com.zenii.realtime"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096713998313-ev61uoajpnimu9ovvtq6cfpp70famt6u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tw.com.zenii.realtime",
+            "certificate_hash": "b668a4df5ff3e41d5fc51a0ddc5dd00768913abf"
+          }
+        },
+        {
+          "client_id": "1096713998313-32mgfa8ubd01666f8ofol1g6qfvi97rm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9vpG1hy7RFvowB73imhpul1cHsz-aJJo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096713998313-32mgfa8ubd01666f8ofol1g6qfvi97rm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

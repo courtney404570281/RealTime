@@ -2,6 +2,7 @@ package tw.com.zenii.realtime
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -32,6 +33,7 @@ import kotlinx.android.synthetic.main.cardview_tracker.*
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.info
+import org.jetbrains.anko.textView
 
 class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
 
@@ -61,125 +63,64 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
             }
         }
 
-        // 追蹤清單
-        var tracker_list = mutableListOf(
-            Tracker("捷運大橋頭站", "FT-707", "客滿", "離站", "9001"),
-            Tracker("捷運大橋頭站", "FT-706", "客滿", "離站", "9001"),
-            Tracker("捷運大橋頭站", "FT-705", "客滿", "離站", "9001"),
-            Tracker("捷運大橋頭站", "FT-704", "客滿", "離站", "9001")
-        )
+        var trackNearStop = getSharedPreferences("tracker", Context.MODE_PRIVATE).getString("nearStop", "捷運大橋頭站")
+        var trackPlateNumb = getSharedPreferences("tracker", Context.MODE_PRIVATE).getString("plateNumb", "KKA-0925")
+        var trackBusStatus = getSharedPreferences("tracker", Context.MODE_PRIVATE).getString("busStatus", "正常")
+        var trackA2EventType = getSharedPreferences("tracker", Context.MODE_PRIVATE).getString("a2EventType", "離站")
+        var trackRouteName = getSharedPreferences("tracker", Context.MODE_PRIVATE).getString("routeName", "2022")
 
-        recyclerView_tracker.layoutManager = LinearLayoutManager(this)
-        recyclerView_tracker.adapter = TrackerAdapter(this, tracker_list)
+        if (trackPlateNumb != null) {
 
-        // CardView 滑動刪除項目
-        val swipeTouchListener = SwipeableRecyclerViewTouchListener(recyclerView_tracker,
-            object : SwipeableRecyclerViewTouchListener.SwipeListener {
-                override fun canSwipeLeft(position: Int): Boolean {
-                    return true
-                }
+            // 追蹤清單
+            var tracker_list = mutableListOf(
+                Tracker(trackNearStop, trackPlateNumb, trackBusStatus, trackA2EventType, trackRouteName)
+            )
 
-                // 向左滑刪除
-                override fun onDismissedBySwipeLeft(
-                    recyclerView: RecyclerView,
-                    reverseSortedPositions: IntArray
-                ) {
-                    for (position in reverseSortedPositions) {
-                        tracker_list.removeAt(position)
-                        recyclerView_tracker.adapter?.notifyItemRemoved(position)
+            recyclerView_tracker.layoutManager = LinearLayoutManager(this)
+            recyclerView_tracker.adapter = TrackerAdapter(this, tracker_list)
+
+            // CardView 滑動刪除項目
+            val swipeTouchListener = SwipeableRecyclerViewTouchListener(recyclerView_tracker,
+                object : SwipeableRecyclerViewTouchListener.SwipeListener {
+                    override fun canSwipeLeft(position: Int): Boolean {
+                        return true
                     }
-                    recyclerView_tracker.adapter?.notifyDataSetChanged()
-                }
 
-                override fun canSwipeRight(position: Int): Boolean {
-                    return true
-                }
-
-                // 向右滑刪除
-                override fun onDismissedBySwipeRight(
-                    recyclerView: RecyclerView,
-                    reverseSortedPositions: IntArray
-                ) {
-                    for (position in reverseSortedPositions) {
-                        tracker_list.removeAt(position)
-                        recyclerView_tracker.adapter?.notifyItemRemoved(position)
+                    // 向左滑刪除
+                    override fun onDismissedBySwipeLeft(
+                        recyclerView: RecyclerView,
+                        reverseSortedPositions: IntArray
+                    ) {
+                        for (position in reverseSortedPositions) {
+                            tracker_list.removeAt(position)
+                            recyclerView_tracker.adapter?.notifyItemRemoved(position)
+                        }
+                        recyclerView_tracker.adapter?.notifyDataSetChanged()
                     }
-                    recyclerView_tracker.adapter?.notifyDataSetChanged()
-                }
 
-            }
-        )
-
-        recyclerView_tracker.addOnItemTouchListener(swipeTouchListener)
-
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_SEARCH) {
-            if (resultCode == Activity.RESULT_OK) {
-                Log.d("fff", "onActivityResult: ")
-                /*var trackPlateNumb = intent.getStringExtra("trackPlateNumb")
-                var trackNearStop = database.readableDatabase
-                    .select("Tracker", "nearStop")
-                    .whereArgs("(plateNumb = {plateNumb})",
-                        "plateNumb" to trackPlateNumb).toString()
-                var trackBusStatus = "客滿"
-                var trackA2EventType = "離站"
-                var trackRouteName = "1818"*/
-
-               /* // 追蹤清單
-                var tracker_list = mutableListOf(
-                    //Tracker(trackNearStop, trackPlateNumb, trackBusStatus, trackA2EventType, trackRouteName),
-                    Tracker("捷運大橋頭站", "FT-706", "客滿", "離站", "9001"),
-                    Tracker("捷運大橋頭站", "FT-705", "客滿", "離站", "9001"),
-                    Tracker("捷運大橋頭站", "FT-704", "客滿", "離站", "9001")
-                )
-
-                recyclerView_tracker.layoutManager = LinearLayoutManager(this)
-                recyclerView_tracker.adapter = TrackerAdapter(this, tracker_list)
-
-                // CardView 滑動刪除項目
-                val swipeTouchListener = SwipeableRecyclerViewTouchListener(recyclerView_tracker,
-                    object : SwipeableRecyclerViewTouchListener.SwipeListener {
-                        override fun canSwipeLeft(position: Int): Boolean {
-                            return true
-                        }
-
-                        // 向左滑刪除
-                        override fun onDismissedBySwipeLeft(
-                            recyclerView: RecyclerView,
-                            reverseSortedPositions: IntArray
-                        ) {
-                            for (position in reverseSortedPositions) {
-                                tracker_list.removeAt(position)
-                                recyclerView_tracker.adapter?.notifyItemRemoved(position)
-                            }
-                            recyclerView_tracker.adapter?.notifyDataSetChanged()
-                        }
-
-                        override fun canSwipeRight(position: Int): Boolean {
-                            return true
-                        }
-
-                        // 向右滑刪除
-                        override fun onDismissedBySwipeRight(
-                            recyclerView: RecyclerView,
-                            reverseSortedPositions: IntArray
-                        ) {
-                            for (position in reverseSortedPositions) {
-                                tracker_list.removeAt(position)
-                                recyclerView_tracker.adapter?.notifyItemRemoved(position)
-                            }
-                            recyclerView_tracker.adapter?.notifyDataSetChanged()
-                        }
-
+                    override fun canSwipeRight(position: Int): Boolean {
+                        return true
                     }
-                )
 
-                recyclerView_tracker.addOnItemTouchListener(swipeTouchListener)*/
-            }
+                    // 向右滑刪除
+                    override fun onDismissedBySwipeRight(
+                        recyclerView: RecyclerView,
+                        reverseSortedPositions: IntArray
+                    ) {
+                        for (position in reverseSortedPositions) {
+                            tracker_list.removeAt(position)
+                            recyclerView_tracker.adapter?.notifyItemRemoved(position)
+                        }
+                        recyclerView_tracker.adapter?.notifyDataSetChanged()
+                    }
+
+                }
+            )
+
+            recyclerView_tracker.addOnItemTouchListener(swipeTouchListener)
+
         }
+
     }
 
     inner class MongoRunnable : Runnable {

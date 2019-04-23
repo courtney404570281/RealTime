@@ -189,4 +189,92 @@ class InterCityBusHandler  {
 
         return results
     }
+
+    // 取得最近站牌
+    fun getNearStop(plateNumb: String): Map<String, String> {
+        val nearStop = HashMap<String, String>()
+        var name: String
+        var numb: String
+
+        val results = mongo.call("getNearStop", plateNumb) ?: return nearStop
+        val ja = JsonParser().parse(results!!).asJsonArray
+
+        for (je in ja) {
+            val res = je.asJsonObject
+            val stops = res.get("StopName").asJsonObject
+            numb = res.get("PlateNumb").asString
+            name = stops.asJsonObject
+                .get("Zh_tw").asString
+            nearStop[numb] = name
+        }
+        return nearStop
+    }
+
+    // 取得車況
+    fun getBusStatus(plateNumb: String): Map<String, String> {
+        val nearStop = HashMap<String, String>()
+        var name: String
+        var numb: String
+
+        val results = mongo.call("getNearStop", plateNumb) ?: return nearStop
+        val ja = JsonParser().parse(results!!).asJsonArray
+
+        for (je in ja) {
+            val res = je.asJsonObject
+            numb = res.get("PlateNumb").asString
+            name = res.get("BusStatus").asString
+            var message = "正常"
+            when (name) {
+                "0" -> "正常"
+                "100" -> "客滿"
+                else -> "異常"
+            }
+            nearStop[numb] = message
+        }
+        return nearStop
+    }
+
+    // 取得車況
+    fun getA2EventType(plateNumb: String): Map<String, String> {
+        val nearStop = HashMap<String, String>()
+        var name: String
+        var numb: String
+
+        val results = mongo.call("getNearStop", plateNumb) ?: return nearStop
+        val ja = JsonParser().parse(results!!).asJsonArray
+
+        for (je in ja) {
+            val res = je.asJsonObject
+            numb = res.get("PlateNumb").asString
+            name = res.get("BusStatus").asString
+            var message = "離站"
+            when (name) {
+                "0" -> "正常"
+                "1" -> "進站"
+            }
+            nearStop[numb] = message
+        }
+        return nearStop
+    }
+
+    // 取得路線
+    fun getRoute(plateNumb: String): Map<String, String> {
+        val nearStop = HashMap<String, String>()
+        var name: String
+        var numb: String
+
+        val results = mongo.call("getNearStop", plateNumb) ?: return nearStop
+        val ja = JsonParser().parse(results!!).asJsonArray
+
+        for (je in ja) {
+            val res = je.asJsonObject
+            val stops = res.get("RouteName").asJsonObject
+            numb = res.get("PlateNumb").asString
+            name = stops.asJsonObject
+                .get("Zh_tw").asString
+            nearStop[numb] = name
+        }
+        return nearStop
+    }
+
 }

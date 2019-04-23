@@ -2,6 +2,7 @@ package tw.com.zenii.realtime
 
 import android.app.Activity
 import android.app.PendingIntent.getActivity
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
@@ -240,12 +241,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
                                         val busStatus = handler.getStopName(trackPlateNumb!!)
                                         val a2EventType = handler.getStopName(trackPlateNumb!!)
                                         val routeName = handler.getStopName(trackPlateNumb!!)*/
-                                        val trackNearStop = "捷運大橋頭站"
-                                        val trackBusStatus = "客滿"
-                                        val trackA2EventType = "離站"
-                                        val trackRouteName = "1818"
+                                        val trackNearStop = handler.getNearStop(trackPlateNumb!!)[trackPlateNumb]
+                                        val trackBusStatus = handler.getBusStatus(trackPlateNumb!!)[trackPlateNumb]
+                                        val trackA2EventType = handler.getA2EventType(trackPlateNumb!!)[trackPlateNumb]
+                                        val trackRouteName = handler.getRoute(trackPlateNumb!!)[trackPlateNumb]
 
-                                        database.use {
+                                        getSharedPreferences("tracker", Context.MODE_PRIVATE)
+                                            .edit()
+                                            .putString("nearStop", trackNearStop)
+                                            .putString("plateNumb", trackPlateNumb)
+                                            .putString("busStatus", trackBusStatus)
+                                            .putString("a2EventType", trackA2EventType)
+                                            .putString("routeName", trackRouteName)
+                                            .apply()
+
+                                        /*database.use {
                                             insert("Tracker",
                                                 "nearStop" to trackNearStop,
                                                 "plateNumb" to trackPlateNumb,
@@ -253,7 +263,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
                                                 "a2EventType" to trackA2EventType,
                                                 "routeName" to trackRouteName
                                             )
-                                        }
+                                        }*/
                                         runOnUiThread {
                                             val intent = Intent(this@MapsActivity, InterCityBusSearch::class.java)
                                             intent.putExtra("trackPlateNumb", trackPlateNumb)
