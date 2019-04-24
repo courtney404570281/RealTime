@@ -97,7 +97,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setAdapter() {
 
         // 各種交通工具列表
-        // TODO: 確認各類交通工具
         var catogories = mutableListOf(
             Category(getString(R.string.bus), R.drawable.bus), // 客運
             Category(getString(R.string.plane), R.drawable.plane), // 飛機

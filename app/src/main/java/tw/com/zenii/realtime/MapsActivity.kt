@@ -25,8 +25,6 @@ import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.Route
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
 import tw.com.zenii.realtime.tab.GoFragment
 import tw.com.zenii.realtime.tab.PagerAdapter
 import java.net.URL
@@ -36,10 +34,9 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import com.google.android.gms.maps.model.Marker
 import kotlinx.coroutines.NonCancellable.isCancelled
+import org.jetbrains.anko.*
 import org.jetbrains.anko.db.insert
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.support.v4.viewPager
-import org.jetbrains.anko.toast
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
@@ -93,8 +90,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
             // 確認是否有來回
             val title = ArrayList<String>()
             // TODO: title 需要 1818A 去 count 1818A1, 1818A2
-            title.add("往 A 地")
-            title.add("往 B 地")
+            title.add("去程")
+            title.add("回程")
             runOnUiThread {
 
                     val fragmentAdapter = PagerAdapter(supportFragmentManager)
@@ -232,28 +229,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
                         if (marker == busMarkerList[i]) {
                             val trackPlateNumb = plateNumbs[busPositions[i]]
 
-                            AlertDialog.Builder(this@MapsActivity)
-                                .setTitle("是否追蹤此車？")
-                                .setMessage("這台車牌是：$trackPlateNumb")
-                                .setPositiveButton("是", ({ dialog, which ->
+                            alert("這台車牌是：$trackPlateNumb", "是否追蹤此車？") {
+                                positiveButton("是") {
                                     GlobalScope.launch {
-                                        /*val nearStop = handler.getStopName(trackPlateNumb!!)
-                                        val busStatus = handler.getStopName(trackPlateNumb!!)
-                                        val a2EventType = handler.getStopName(trackPlateNumb!!)
-                                        val routeName = handler.getStopName(trackPlateNumb!!)*/
-                                        val trackNearStop = handler.getNearStop(trackPlateNumb!!)[trackPlateNumb]
-                                        val trackBusStatus = handler.getBusStatus(trackPlateNumb!!)[trackPlateNumb]
-                                        val trackA2EventType = handler.getA2EventType(trackPlateNumb!!)[trackPlateNumb]
-                                        val trackRouteName = handler.getRoute(trackPlateNumb!!)[trackPlateNumb]
 
-                                        getSharedPreferences("tracker", Context.MODE_PRIVATE)
-                                            .edit()
-                                            .putString("nearStop", trackNearStop)
-                                            .putString("plateNumb", trackPlateNumb)
-                                            .putString("busStatus", trackBusStatus)
-                                            .putString("a2EventType", trackA2EventType)
-                                            .putString("routeName", trackRouteName)
-                                            .apply()
+                                        // TODO: 改成 SQLite
+                                        setPlateNumb(trackPlateNumb!!)
 
                                         /*database.use {
                                             insert("Tracker",
@@ -270,9 +251,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
                                             startActivity(intent)
                                         }
                                     }
-                                }))
-                                .setNegativeButton("否", null)
-                                .show()
+                                }
+                                negativeButton("否") { null }
+                            }.show()
                         }
                     }
 
@@ -299,12 +280,3 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
     }
 }
 
-/*
-
-{  "_id" : "test",
-   "PositionPoints" : [[25.0495916666667, 121.511863333333], [25.0495916666667, 121.511863333333],
-   [25.04952, 121.511833333333], [25.0494883333333, 121.511843333333], [25.0494883333333, 121.511843333333],
-    [25.0498483333333, 121.511933333333], [25.05125, 121.511911666667], [25.0524683333333, 121.511828333333]]
-}
-
- */

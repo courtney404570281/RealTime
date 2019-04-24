@@ -13,7 +13,7 @@ import java.io.File
 
 // 1818A
 fun Activity.setRouteId(route: String){
-
+// TODO: 改成 SQLite
     /*database.use {
         insert("Route", "route" to route)
     }*/
@@ -26,7 +26,7 @@ fun Activity.setRouteId(route: String){
 
 // 1818A
 fun Activity.getRouteId(): String {
-
+// TODO: 改成 SQLite
     return getSharedPreferences("route", Context.MODE_PRIVATE)
         .getString("route", "")
     /*val route = database.readableDatabase
@@ -39,6 +39,7 @@ fun Activity.getRouteId(): String {
 
 // 1818A1
 fun Activity.setMapRouteId(route: String) {
+    // TODO: 改成 SQLite
     getSharedPreferences("mapRoute", Context.MODE_PRIVATE)
         .edit()
         .putString("mapRoute", route)
@@ -47,6 +48,20 @@ fun Activity.setMapRouteId(route: String) {
 
 // 1818A1
 fun Activity.getMapRouteId(): String {
+    // TODO: 改成 SQLite
     return getSharedPreferences("mapRoute", Context.MODE_PRIVATE)
         .getString("mapRoute", "")
+}
+
+fun Activity.setPlateNumb(trackPlateNumb: String) {
+    getSharedPreferences("tracker", Context.MODE_PRIVATE)
+        .edit()
+        .putString("plateNumb", trackPlateNumb)
+        .apply()
+}
+
+fun Activity.getPlateNumb(): String {
+    // TODO: 改成 SQLite
+    return getSharedPreferences("tracker", Context.MODE_PRIVATE)
+        .getString("plateNumb", "KKA-0925")
 }

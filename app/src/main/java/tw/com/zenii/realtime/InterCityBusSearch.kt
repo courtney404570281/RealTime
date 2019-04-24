@@ -31,13 +31,16 @@ import com.pawegio.kandroid.onQuerySubmit
 import com.pawegio.kandroid.runOnUiThread
 import kotlinx.android.synthetic.main.cardview_tracker.*
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.info
 import org.jetbrains.anko.textView
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
 
-    private val RC_SEARCH = 100
+    val interCityBusHandler = InterCityBusHandler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,64 +66,86 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
             }
         }
 
-        var trackNearStop = getSharedPreferences("tracker", Context.MODE_PRIVATE).getString("nearStop", "捷運大橋頭站")
-        var trackPlateNumb = getSharedPreferences("tracker", Context.MODE_PRIVATE).getString("plateNumb", "KKA-0925")
-        var trackBusStatus = getSharedPreferences("tracker", Context.MODE_PRIVATE).getString("busStatus", "正常")
-        var trackA2EventType = getSharedPreferences("tracker", Context.MODE_PRIVATE).getString("a2EventType", "離站")
-        var trackRouteName = getSharedPreferences("tracker", Context.MODE_PRIVATE).getString("routeName", "2022")
+        // 每 5 秒更新一次資料
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
+            GlobalScope.launch {
+                drawTrackerList()
+            }
+            // 測試 5s
+            info { "InterCityBusTimer: ${Date()}" }
+        }, 0, 60, TimeUnit.SECONDS)
 
-        if (trackPlateNumb != null) {
+    }
 
-            // 追蹤清單
-            var tracker_list = mutableListOf(
-                Tracker(trackNearStop, trackPlateNumb, trackBusStatus, trackA2EventType, trackRouteName)
-            )
+    private fun drawTrackerList() {
+        GlobalScope.launch {
 
-            recyclerView_tracker.layoutManager = LinearLayoutManager(this)
-            recyclerView_tracker.adapter = TrackerAdapter(this, tracker_list)
+            var trackPlateNumb = getPlateNumb()
+            val trackNearStop = interCityBusHandler.getNearStop(trackPlateNumb!!)[trackPlateNumb]
+            val trackBusStatus = interCityBusHandler.getBusStatus(trackPlateNumb!!)[trackPlateNumb]
+            val trackA2EventType = interCityBusHandler.getA2EventType(trackPlateNumb!!)[trackPlateNumb]
+            //val trackRouteName = interCityBusHandler.getRoute(trackPlateNumb!!)[trackPlateNumb]
+            // TODO: 查詢 RouteName 解決方式
+            val trackRouteName = "2022"
 
-            // CardView 滑動刪除項目
-            val swipeTouchListener = SwipeableRecyclerViewTouchListener(recyclerView_tracker,
-                object : SwipeableRecyclerViewTouchListener.SwipeListener {
-                    override fun canSwipeLeft(position: Int): Boolean {
-                        return true
-                    }
+            info { "Tracker: $trackPlateNumb  $trackNearStop  $trackBusStatus  $trackA2EventType  $trackRouteName" }
 
-                    // 向左滑刪除
-                    override fun onDismissedBySwipeLeft(
-                        recyclerView: RecyclerView,
-                        reverseSortedPositions: IntArray
-                    ) {
-                        for (position in reverseSortedPositions) {
-                            tracker_list.removeAt(position)
-                            recyclerView_tracker.adapter?.notifyItemRemoved(position)
+            if (trackBusStatus != null) {
+
+                // 追蹤清單
+                var tracker_list = mutableListOf(
+                    Tracker(trackNearStop, trackPlateNumb, trackBusStatus, trackA2EventType, trackRouteName)
+                )
+
+                runOnUiThread {
+
+                    recyclerView_tracker.layoutManager = LinearLayoutManager(this@InterCityBusSearch)
+                    recyclerView_tracker.adapter = TrackerAdapter(this@InterCityBusSearch, tracker_list)
+
+
+                    // CardView 滑動刪除項目
+                    val swipeTouchListener = SwipeableRecyclerViewTouchListener(recyclerView_tracker,
+                        object : SwipeableRecyclerViewTouchListener.SwipeListener {
+                            override fun canSwipeLeft(position: Int): Boolean {
+                                return true
+                            }
+
+                            // 向左滑刪除
+                            override fun onDismissedBySwipeLeft(
+                                recyclerView: RecyclerView,
+                                reverseSortedPositions: IntArray
+                            ) {
+                                for (position in reverseSortedPositions) {
+                                    tracker_list.removeAt(position)
+                                    recyclerView_tracker.adapter?.notifyItemRemoved(position)
+                                }
+                                recyclerView_tracker.adapter?.notifyDataSetChanged()
+                            }
+
+                            override fun canSwipeRight(position: Int): Boolean {
+                                return true
+                            }
+
+                            // 向右滑刪除
+                            override fun onDismissedBySwipeRight(
+                                recyclerView: RecyclerView,
+                                reverseSortedPositions: IntArray
+                            ) {
+                                for (position in reverseSortedPositions) {
+                                    tracker_list.removeAt(position)
+                                    recyclerView_tracker.adapter?.notifyItemRemoved(position)
+                                }
+                                recyclerView_tracker.adapter?.notifyDataSetChanged()
+                            }
+
                         }
-                        recyclerView_tracker.adapter?.notifyDataSetChanged()
-                    }
+                    )
 
-                    override fun canSwipeRight(position: Int): Boolean {
-                        return true
-                    }
-
-                    // 向右滑刪除
-                    override fun onDismissedBySwipeRight(
-                        recyclerView: RecyclerView,
-                        reverseSortedPositions: IntArray
-                    ) {
-                        for (position in reverseSortedPositions) {
-                            tracker_list.removeAt(position)
-                            recyclerView_tracker.adapter?.notifyItemRemoved(position)
-                        }
-                        recyclerView_tracker.adapter?.notifyDataSetChanged()
-                    }
-
+                    recyclerView_tracker.addOnItemTouchListener(swipeTouchListener)
                 }
-            )
 
-            recyclerView_tracker.addOnItemTouchListener(swipeTouchListener)
-
+            }
         }
-
     }
 
     inner class MongoRunnable : Runnable {
@@ -146,9 +171,9 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
 
                     val resJa = interCityBusHandler.getRouteSearchResult(subRouteId)
                     for (je in resJa) {
-                        val jo = je.getAsJsonObject()
-                        result = jo.get("SubRouteID").getAsString() + "\n" + jo.get("Headsign").getAsString()
-                        resultId = jo.get("SubRouteID").getAsString()
+                        val jo = je.asJsonObject
+                        result = jo.get("SubRouteID").asString + "\n" + jo.get("Headsign").asString
+                        resultId = jo.get("SubRouteID").asString
                         info { "result: $result" }
                         routeNameResults.add(result)
                         routeIdResults.add(resultId)
@@ -158,20 +183,19 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
 
                     runOnUiThread {
                         if(routeNameResults.isEmpty()){
-                            AlertDialog.Builder(this@InterCityBusSearch)
-                                .setTitle(getString(R.string.message))
-                                .setMessage(subRouteId + "\t" + getString(R.string.not_found))
-                                .setPositiveButton(getString(R.string.search_others)) { dialog, which ->
+
+                            alert(subRouteId + "\t" + getString(R.string.not_found), getString(R.string.message)) {
+                                positiveButton(getString(R.string.search_others)) {
                                     search.setQuery("", false)
                                     search.isIconified
                                 }
-                                .show()
+                            }.show()
                         }
 
                         val adapter =
                             ArrayAdapter(this@InterCityBusSearch, android.R.layout.simple_list_item_1, routeNameResults)
                         list.adapter = adapter
-                        var itemListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+                        var itemListener = AdapterView.OnItemClickListener { _, _, position, _ ->
                             var type = routeIdResults[position].substring(4)
                             var route = routeIdResults[position].substring(0, 4)
                             if (type == "") {
