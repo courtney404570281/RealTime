@@ -39,9 +39,11 @@ class GoFragment : Fragment() , AnkoLogger {
         GlobalScope.launch {
             // 每 1 秒更新一次資料
             Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
-                listStop(view)
-                // 測試 1s
-                info { "GoFragmentTimer: ${Date()}" }
+                if(activity!=null){
+                    listStop(view)
+                    // 測試 1s
+                    info { "GoFragmentTimer: ${Date()}" }
+                }
             }, 0, 1, TimeUnit.SECONDS)
         }
 

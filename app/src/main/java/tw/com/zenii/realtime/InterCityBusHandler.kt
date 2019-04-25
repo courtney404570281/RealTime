@@ -216,12 +216,12 @@ class InterCityBusHandler  {
 
     // 取得車況
     fun getBusStatus(plateNumb: String): Map<String, String> {
-        val nearStop = HashMap<String, String>()
+        val busStatus = HashMap<String, String>()
         var name: String
         var numb: String
-        var temp: String = ""
+        var temp = ""
 
-        val results = mongo.call("getNearStop", plateNumb) ?: return nearStop
+        val results = mongo.call("getNearStop", plateNumb) ?: return busStatus
         val ja = JsonParser().parse(results!!).asJsonArray
 
         for (je in ja) {
@@ -236,7 +236,7 @@ class InterCityBusHandler  {
                     "100" -> "客滿"
                     else -> "異常"
                 }
-                nearStop[numb] = message
+                busStatus[numb] = message
                 temp = name
             } else {
 
@@ -246,20 +246,20 @@ class InterCityBusHandler  {
                     "100" -> "客滿"
                     else -> "異常"
                 }
-                nearStop[numb] = message
+                busStatus[numb] = message
             }
         }
-        return nearStop
+        return busStatus
     }
 
     // 取得車況
     fun getA2EventType(plateNumb: String): Map<String, String> {
-        val nearStop = HashMap<String, String>()
+        val a2EventType = HashMap<String, String>()
         var name: String
         var numb: String
-        var temp: String = ""
+        var temp = ""
 
-        val results = mongo.call("getNearStop", plateNumb) ?: return nearStop
+        val results = mongo.call("getNearStop", plateNumb) ?: return a2EventType
         val ja = JsonParser().parse(results!!).asJsonArray
 
         for (je in ja) {
@@ -272,7 +272,7 @@ class InterCityBusHandler  {
                     "0" -> "正常"
                     "1" -> "進站"
                 }
-                nearStop[numb] = message
+                a2EventType[numb] = message
                 temp = name
             } else {
 
@@ -281,14 +281,14 @@ class InterCityBusHandler  {
                     "0" -> "正常"
                     "1" -> "進站"
                 }
-                nearStop[numb] = message
+                a2EventType[numb] = message
             }
         }
-        return nearStop
+        return a2EventType
     }
 
     // 取得路線
-    fun getRoute(plateNumb: String): HashMap<String, String?> {
+    fun getSubRouteName(plateNumb: String): HashMap<String, String?> {
         val nearStop = HashMap<String, String?>()
         var name: String
         var numb: String
@@ -298,10 +298,13 @@ class InterCityBusHandler  {
 
         for (je in ja) {
             val res = je.asJsonObject
-            val stops = res.get("RouteName").asJsonObject
+            val stops = res.get("SubRouteName").asJsonObject
             numb = res.get("PlateNumb").asString
             name = stops.asJsonObject
                 .get("Zh_tw").asString
+            if (name.substring(4) == "0") {
+                name = name.substring(0,4)
+            }
             nearStop[numb] = name
         }
         return nearStop

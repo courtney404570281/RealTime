@@ -18,7 +18,6 @@ class MyDatabaseOpenHelper private constructor(ctx: Context) : ManagedSQLiteOpen
 
     override fun onCreate(db: SQLiteDatabase) {
 
-        // Here you create tables
         db.createTable("Route", true,
             "id" to INTEGER + PRIMARY_KEY + UNIQUE,
             "route" to TEXT)
@@ -29,11 +28,7 @@ class MyDatabaseOpenHelper private constructor(ctx: Context) : ManagedSQLiteOpen
 
         db.createTable("Tracker", true,
             "id" to INTEGER + PRIMARY_KEY + UNIQUE,
-            "nearStop" to TEXT,
-            "plateNumb" to TEXT,
-            "busStatus" to TEXT,
-            "a2EventType" to TEXT,
-            "routeName" to TEXT)
+            "plateNumb" to TEXT)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {

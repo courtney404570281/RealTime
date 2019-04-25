@@ -7,10 +7,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.constraintlayout.widget.Constraints.TAG
 import kotlinx.coroutines.selects.select
+import org.jetbrains.anko.db.StringParser
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
+import org.jetbrains.anko.info
 import java.io.File
 
+val plateNumbList = arrayListOf<String>()
 // 1818A
 fun Activity.setRouteId(route: String){
 // TODO: 改成 SQLite
@@ -54,14 +57,21 @@ fun Activity.getMapRouteId(): String {
 }
 
 fun Activity.setPlateNumb(trackPlateNumb: String) {
-    getSharedPreferences("tracker", Context.MODE_PRIVATE)
-        .edit()
-        .putString("plateNumb", trackPlateNumb)
-        .apply()
+    database.use {
+        insert("Tracker",
+            "plateNumb" to trackPlateNumb
+        )
+    }
 }
 
-fun Activity.getPlateNumb(): String {
+fun Activity.getPlateNumb(): List<String> {
     // TODO: 改成 SQLite
-    return getSharedPreferences("tracker", Context.MODE_PRIVATE)
-        .getString("plateNumb", "KKA-0925")
+    var plateNumbList = arrayListOf<String>()
+    database.use {
+        select ("Tracker", "plateNumb")
+            .parseList(StringParser).forEach {
+                plateNumbList.add(it)
+            }
+    }
+    return plateNumbList
 }

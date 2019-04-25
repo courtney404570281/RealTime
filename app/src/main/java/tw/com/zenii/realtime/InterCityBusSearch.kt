@@ -30,8 +30,12 @@ import com.arlib.floatingsearchview.suggestions.SearchSuggestionsAdapter
 import com.pawegio.kandroid.onQuerySubmit
 import com.pawegio.kandroid.runOnUiThread
 import kotlinx.android.synthetic.main.cardview_tracker.*
+import kotlinx.coroutines.selects.select
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.db.StringParser
+import org.jetbrains.anko.db.delete
+import org.jetbrains.anko.db.parseList
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.info
 import org.jetbrains.anko.textView
@@ -80,27 +84,34 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
     private fun drawTrackerList() {
         GlobalScope.launch {
 
-            var trackPlateNumb = getPlateNumb()
-            val trackNearStop = interCityBusHandler.getNearStop(trackPlateNumb!!)[trackPlateNumb]
-            val trackBusStatus = interCityBusHandler.getBusStatus(trackPlateNumb!!)[trackPlateNumb]
-            val trackA2EventType = interCityBusHandler.getA2EventType(trackPlateNumb!!)[trackPlateNumb]
-            //val trackRouteName = interCityBusHandler.getRoute(trackPlateNumb!!)[trackPlateNumb]
-            // TODO: 查詢 RouteName 解決方式
-            val trackRouteName = "2022"
+            var trackPlateNumb = ""
+            var trackNearStop = interCityBusHandler.getNearStop(trackPlateNumb!!)[trackPlateNumb]
+            var trackBusStatus = interCityBusHandler.getBusStatus(trackPlateNumb!!)[trackPlateNumb]
+            var trackA2EventType = interCityBusHandler.getA2EventType(trackPlateNumb!!)[trackPlateNumb]
+            var trackRouteName = interCityBusHandler.getSubRouteName(trackPlateNumb!!)[trackPlateNumb]
+
+            for(i in 0 until getPlateNumb().size) {
+                trackPlateNumb = getPlateNumb()[i]
+                trackNearStop = interCityBusHandler.getNearStop(trackPlateNumb!!)[trackPlateNumb]
+                trackBusStatus = interCityBusHandler.getBusStatus(trackPlateNumb!!)[trackPlateNumb]
+                trackA2EventType = interCityBusHandler.getA2EventType(trackPlateNumb!!)[trackPlateNumb]
+                trackRouteName = interCityBusHandler.getSubRouteName(trackPlateNumb!!)[trackPlateNumb]
+            }
 
             info { "Tracker: $trackPlateNumb  $trackNearStop  $trackBusStatus  $trackA2EventType  $trackRouteName" }
 
             if (trackBusStatus != null) {
 
                 // 追蹤清單
-                var tracker_list = mutableListOf(
-                    Tracker(trackNearStop, trackPlateNumb, trackBusStatus, trackA2EventType, trackRouteName)
-                )
+                var tracker = arrayListOf<Tracker>()
+                for (i in 0 until getPlateNumb().size) {
+                    tracker.add(Tracker(trackNearStop, getPlateNumb()[i], trackBusStatus, trackA2EventType, trackRouteName))
+                }
 
                 runOnUiThread {
 
                     recyclerView_tracker.layoutManager = LinearLayoutManager(this@InterCityBusSearch)
-                    recyclerView_tracker.adapter = TrackerAdapter(this@InterCityBusSearch, tracker_list)
+                    recyclerView_tracker.adapter = TrackerAdapter(this@InterCityBusSearch, tracker)
 
 
                     // CardView 滑動刪除項目
@@ -116,8 +127,11 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
                                 reverseSortedPositions: IntArray
                             ) {
                                 for (position in reverseSortedPositions) {
-                                    tracker_list.removeAt(position)
+                                    tracker.removeAt(position)
                                     recyclerView_tracker.adapter?.notifyItemRemoved(position)
+                                    /*database.use{
+                                        execSQL("delete from Tracker where ROWID = position")
+                                    }*/
                                 }
                                 recyclerView_tracker.adapter?.notifyDataSetChanged()
                             }
@@ -132,8 +146,11 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
                                 reverseSortedPositions: IntArray
                             ) {
                                 for (position in reverseSortedPositions) {
-                                    tracker_list.removeAt(position)
+                                    tracker.removeAt(position)
                                     recyclerView_tracker.adapter?.notifyItemRemoved(position)
+                                    /*database.use{
+                                        execSQL("delete from Tracker where id = position")
+                                    }*/
                                 }
                                 recyclerView_tracker.adapter?.notifyDataSetChanged()
                             }
@@ -145,6 +162,7 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
                 }
 
             }
+
         }
     }
 
@@ -201,7 +219,7 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
                             if (type == "") {
                                 route += "0"
                             } else {
-                                route = routeIdResults.get(position).substring(0, 5)
+                                route = routeIdResults[position].substring(0, 5)
                             }
                             info { "itemListener: $route" }
 
@@ -210,6 +228,7 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
                             setRouteId(route)
                             info { "setRouteId: $route" }
                             startActivity(intent)
+                            finish()
                         }
                         list.onItemClickListener = itemListener
 

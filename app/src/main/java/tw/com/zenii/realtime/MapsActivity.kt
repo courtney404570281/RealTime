@@ -233,22 +233,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
                                 positiveButton("是") {
                                     GlobalScope.launch {
 
-                                        // TODO: 改成 SQLite
                                         setPlateNumb(trackPlateNumb!!)
 
-                                        /*database.use {
-                                            insert("Tracker",
-                                                "nearStop" to trackNearStop,
-                                                "plateNumb" to trackPlateNumb,
-                                                "busStatus" to trackBusStatus,
-                                                "a2EventType" to trackA2EventType,
-                                                "routeName" to trackRouteName
-                                            )
-                                        }*/
                                         runOnUiThread {
                                             val intent = Intent(this@MapsActivity, InterCityBusSearch::class.java)
                                             intent.putExtra("trackPlateNumb", trackPlateNumb)
                                             startActivity(intent)
+                                            finish()
                                         }
                                     }
                                 }
