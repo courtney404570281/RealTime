@@ -13,45 +13,45 @@ import org.jetbrains.anko.db.select
 import org.jetbrains.anko.info
 import java.io.File
 
-val plateNumbList = arrayListOf<String>()
-// 1818A
-fun Activity.setRouteId(route: String){
-// TODO: 改成 SQLite
-    /*database.use {
-        insert("Route", "route" to route)
-    }*/
+// 1818 4 碼
+fun Activity.setSearchRouteId(route: String){
+    getSharedPreferences("searchRoute", Context.MODE_PRIVATE)
+        .edit()
+        .putString("searchRoute", route)
+        .apply()
+}
 
+// 1818 4 碼
+fun Activity.getSearchRouteId(): String {
+    return getSharedPreferences("searchRoute", Context.MODE_PRIVATE)
+        .getString("searchRoute", "")
+}
+
+
+// 1818A 5 碼
+fun Activity.setRouteId(route: String){
     getSharedPreferences("route", Context.MODE_PRIVATE)
         .edit()
         .putString("route", route)
         .apply()
 }
 
-// 1818A
+// 1818A 5 碼
 fun Activity.getRouteId(): String {
-// TODO: 改成 SQLite
     return getSharedPreferences("route", Context.MODE_PRIVATE)
         .getString("route", "")
-    /*val route = database.readableDatabase
-        .select("Route", "route")
-        .whereArgs("(_id = {userId})", "userId" to 0)
-        .toString()
-    Log.d(TAG, "getRouteId: $route")
-    return route*/
 }
 
-// 1818A1
+// 1818A1 6 碼
 fun Activity.setMapRouteId(route: String) {
-    // TODO: 改成 SQLite
     getSharedPreferences("mapRoute", Context.MODE_PRIVATE)
         .edit()
         .putString("mapRoute", route)
         .apply()
 }
 
-// 1818A1
+// 1818A1 6 碼
 fun Activity.getMapRouteId(): String {
-    // TODO: 改成 SQLite
     return getSharedPreferences("mapRoute", Context.MODE_PRIVATE)
         .getString("mapRoute", "")
 }
@@ -65,7 +65,6 @@ fun Activity.setPlateNumb(trackPlateNumb: String) {
 }
 
 fun Activity.getPlateNumb(): List<String> {
-    // TODO: 改成 SQLite
     var plateNumbList = arrayListOf<String>()
     database.use {
         select ("Tracker", "plateNumb")

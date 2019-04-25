@@ -90,8 +90,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
             // 確認是否有來回
             val title = ArrayList<String>()
             // TODO: title 需要 1818A 去 count 1818A1, 1818A2
-            title.add("去程")
-            title.add("回程")
+            title.add("往 ${handler.getDestination(getSearchRouteId())}")
+            info { "Destination: 往 ${handler.getDestination(getSearchRouteId())}" }
+            title.add("往 ${handler.getDeparture(getSearchRouteId())}")
             runOnUiThread {
 
                     val fragmentAdapter = PagerAdapter(supportFragmentManager)

@@ -55,6 +55,7 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
 
             search.onQuerySubmit { query ->
             info { "search: $query" }
+                setSearchRouteId(query)
             val mongoRunnable = MongoRunnable()
             Thread(mongoRunnable).start()
             try {

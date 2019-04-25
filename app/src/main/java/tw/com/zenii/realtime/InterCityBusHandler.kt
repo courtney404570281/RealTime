@@ -21,7 +21,7 @@ class InterCityBusHandler  {
         val subRouteNamesGotten = ArrayList<String>()
 
         val result = mongo.call("getRouteSearchResult", key) ?: return jaToReturn
-        //Log.d("result", result)
+        Log.d("result", result)
         val resObj = JsonParser().parse(result!!).asJsonObject
 
         // build jaToReturn here
@@ -44,6 +44,30 @@ class InterCityBusHandler  {
         }
 
         return jaToReturn
+    }
+
+    // 取得終點站
+    fun getDeparture(subRouteId: String): String {
+        var departure = ""
+
+        val result = mongo.call("getRouteSearchResult", subRouteId) ?: return departure
+        val resObj = JsonParser().parse(result!!).asJsonObject
+        departure = resObj.get("DepartureStopNameZh").asString
+        Log.d("result1", departure)
+
+        return departure
+    }
+
+    // 取得終點站
+    fun getDestination(subRouteId: String): String {
+        var destination = ""
+
+        val result = mongo.call("getRouteSearchResult", subRouteId) ?: return destination
+        val resObj = JsonParser().parse(result!!).asJsonObject
+        destination = resObj.get("DestinationStopNameZh").asString
+        Log.d("result1", destination)
+
+        return destination
     }
 
     // 取得站牌位置
@@ -298,9 +322,9 @@ class InterCityBusHandler  {
 
         for (je in ja) {
             val res = je.asJsonObject
-            val stops = res.get("SubRouteName").asJsonObject
             numb = res.get("PlateNumb").asString
-            name = stops.asJsonObject
+            name = res.get("SubRouteName").asJsonObject
+                .asJsonObject
                 .get("Zh_tw").asString
             if (name.substring(4) == "0") {
                 name = name.substring(0,4)
