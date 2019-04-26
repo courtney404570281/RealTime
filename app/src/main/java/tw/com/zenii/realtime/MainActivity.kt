@@ -20,16 +20,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        setContentView(R.layout.content_main)
 
-        val toggle = ActionBarDrawerToggle(
+        window.statusBarColor = getColor(R.color.colorPrimaryDark)
+        //setSupportActionBar(toolbar)
+
+        /*val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
-        nav_view.setNavigationItemSelectedListener(this)
+        nav_view.setNavigationItemSelectedListener(this)*/
 
         // RecyclerView 之 Adapter
         setAdapter()
@@ -48,23 +50,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         return true
-    }
+    }*/
 
     // 設定（右上角）設定
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    /*override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
-    }
+    }*/
 
     // 設定選單
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
-        when (item.itemId) {
+       /* when (item.itemId) {
             R.id.nav_camera -> {
 
             }
@@ -85,7 +87,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        drawer_layout.closeDrawer(GravityCompat.START)
+        drawer_layout.closeDrawer(GravityCompat.START)*/
         return true
     }
 

@@ -51,7 +51,6 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inter_city_bus_search)
 
-        window.statusBarColor = getColor(R.color.colorPrimary)
         // 在 searchView 內取值
         search.queryHint = getString(R.string.please_enter_the_route)
 
