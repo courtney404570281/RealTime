@@ -172,6 +172,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, AnkoLogger {
             val stopPositions = handler.getStopPosition(getMapRouteId())
             // 各站站名
             val stopNames = handler.getStopName(getMapRouteId())
+            // 真實地圖
+            val realRoutes = handler.getRealRoute()
 
             runOnUiThread {
 

@@ -204,13 +204,27 @@ class InterCityBusHandler  {
         return stopNames
     }
 
-    // test
-    fun getTest(): String {
-        val test = ArrayList<String>()
-        val results = mongo.call("getRealRoute", "test") ?: return ""
+    // getRealRoute 暫時不使用，目前只有 1818 的資料
+    fun getRealRoute(): List<LatLng> {
+        var positions = ArrayList<LatLng>()
 
-        return results
+        val results = mongo.call("getRealRoute", "test") ?: return positions
+        val ja = JsonParser().parse(results!!).asJsonObject
+            .get("PositionPoints").asJsonArray
+        for (je in ja) {
+            val lat = je.asJsonArray[0].asDouble
+            val lng = je.asJsonArray[1].asDouble
+//            Log.d(TAG, "getRealRoute: $lat $lng")
+            positions.add(LatLng(lat, lng))
+        }
+        return positions
     }
+
+
+    /*
+    { "_id" : "test", "PositionPoints" : [ [ 25.0495916666667, 121.511863333333 ], [ 25.0495916666667, 121.511863333333 ], ... ]}
+    */
+
 
     // 取得最近站牌
     fun getNearStop(plateNumb: String): Map<String, String> {

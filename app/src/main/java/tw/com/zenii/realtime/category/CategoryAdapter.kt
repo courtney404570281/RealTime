@@ -18,7 +18,7 @@ import tw.com.zenii.realtime.InterCityBusSearch
 import tw.com.zenii.realtime.MainActivity
 import tw.com.zenii.realtime.R
 
-class CategoryAdapter (val context: Context, val category: MutableList<Category>) :
+class CategoryAdapter (val context: Context, private val category: MutableList<Category>) :
     RecyclerView.Adapter<CategoryAdapter.ViewHolder>() , AnkoLogger{
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,7 +34,9 @@ class CategoryAdapter (val context: Context, val category: MutableList<Category>
         holder.itemView.setOnClickListener {
             val intent = Intent(context, InterCityBusSearch::class.java)
             when (position) {
-                0 -> startActivity(context, intent, null)
+                0 -> {
+                    startActivity(context, intent, null)
+                }
             }
         }
     }

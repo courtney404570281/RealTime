@@ -198,7 +198,7 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
                         routeIdResults.add(resultId)
                     }
 
-                    info { "getTest(): ${interCityBusHandler.getTest()}"  }
+                    info { "${interCityBusHandler.getRealRoute()}"  }
 
                     runOnUiThread {
                         if(routeNameResults.isEmpty()){
