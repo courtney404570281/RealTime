@@ -220,12 +220,6 @@ class InterCityBusHandler  {
         return positions
     }
 
-
-    /*
-    { "_id" : "test", "PositionPoints" : [ [ 25.0495916666667, 121.511863333333 ], [ 25.0495916666667, 121.511863333333 ], ... ]}
-    */
-
-
     // 取得最近站牌
     fun getNearStop(plateNumb: String): Map<String, String> {
         val nearStop = HashMap<String, String>()
