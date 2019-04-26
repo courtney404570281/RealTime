@@ -1,25 +1,16 @@
 package tw.com.zenii.realtime
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
-import com.pawegio.kandroid.inflateLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.cardview_main.view.*
 import kotlinx.android.synthetic.main.content_main.*
 import tw.com.zenii.realtime.category.Category
 import tw.com.zenii.realtime.category.CategoryAdapter
@@ -107,5 +98,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         recyclerView.adapter = CategoryAdapter(this, catogories)
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        val animation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_slide_from_right)
+        recyclerView.layoutAnimation = animation
     }
 }
