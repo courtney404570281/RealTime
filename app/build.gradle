@@ -56,5 +56,5 @@ dependencies {
     implementation "org.jetbrains.anko:anko-appcompat-v7:$anko_version"
     implementation 'com.pawegio.kandroid:kandroid:0.8.8@aar'
     implementation 'com.google.firebase:firebase-core:16.0.8'
-
+    implementation 'com.github.arimorty:floatingsearchview:2.1.1'
 }

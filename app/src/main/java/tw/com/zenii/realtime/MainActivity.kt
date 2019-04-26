@@ -12,6 +12,7 @@ import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import org.jetbrains.anko.alert
 import tw.com.zenii.realtime.category.Category
 import tw.com.zenii.realtime.category.CategoryAdapter
 
@@ -38,6 +39,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
+            alert("確定要離開？"){
+                positiveButton("是") { finish() }
+                negativeButton("再看看！") { null }
+            }
         } else {
             super.onBackPressed()
         }

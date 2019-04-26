@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -50,6 +51,7 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inter_city_bus_search)
 
+        window.statusBarColor = getColor(R.color.colorPrimary)
         // 在 searchView 內取值
         search.queryHint = getString(R.string.please_enter_the_route)
 

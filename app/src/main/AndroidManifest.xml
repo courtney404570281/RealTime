@@ -31,7 +31,8 @@
                 android:label="@string/title_activity_maps"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".InterCityBusSearch">
+        <activity android:name=".InterCityBusSearch"
+                  android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
                 android:name=".MainActivity"
