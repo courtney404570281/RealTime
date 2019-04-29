@@ -18,6 +18,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layoutAnimation="@anim/layout_animation_slide_from_right"
-    />
+            />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

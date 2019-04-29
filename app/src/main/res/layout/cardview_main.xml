@@ -12,6 +12,7 @@
             android:scaleType="fitXY"
             android:adjustViewBounds="true"
             app:srcCompat="@drawable/plane"
+            android:foreground="@drawable/drawable_ripple"
     />
 
     <TextView
