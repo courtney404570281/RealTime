@@ -39,15 +39,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawer(GravityCompat.START)
-            alert("確定要離開？"){
-                positiveButton("是") { finish() }
-                negativeButton("再看看！") { null }
-            }
-        } else {
-            super.onBackPressed()
-        }
+        super.onBackPressed()
     }
 
     /*override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -13,7 +13,7 @@ import kotlin.collections.ArrayList
 
 class InterCityBusHandler  {
 
-    val mongo = Mongo()
+    private val mongo = Mongo()
 
     // 取得搜尋結果
     fun getRouteSearchResult(key: String): JsonArray {
@@ -46,7 +46,7 @@ class InterCityBusHandler  {
         return jaToReturn
     }
 
-    // 取得終點站
+    // 取得起點站
     fun getDeparture(subRouteId: String): String {
         var departure = ""
 
@@ -297,11 +297,11 @@ class InterCityBusHandler  {
         for (je in ja) {
             val res = je.asJsonObject
             numb = res.get("PlateNumb").asString
-            name = res.get("BusStatus").asString
+            name = res.get("A2EventType").asString
             if (name != null) {
                 var message = "離站"
                 when (name) {
-                    "0" -> "正常"
+                    "0" -> "離站"
                     "1" -> "進站"
                 }
                 a2EventType[numb] = message
@@ -310,7 +310,7 @@ class InterCityBusHandler  {
 
                 var message = "離站"
                 when (temp) {
-                    "0" -> "正常"
+                    "0" -> "離站"
                     "1" -> "進站"
                 }
                 a2EventType[numb] = message
@@ -321,11 +321,11 @@ class InterCityBusHandler  {
 
     // 取得路線
     fun getSubRouteName(plateNumb: String): HashMap<String, String?> {
-        val nearStop = HashMap<String, String?>()
+        val subRouteName = HashMap<String, String?>()
         var name: String
         var numb: String
 
-        val results = mongo.call("getNearStop", plateNumb) ?: return nearStop
+        val results = mongo.call("getNearStop", plateNumb) ?: return subRouteName
         val ja = JsonParser().parse(results!!).asJsonArray
 
         for (je in ja) {
@@ -337,9 +337,9 @@ class InterCityBusHandler  {
             if (name.substring(4) == "0") {
                 name = name.substring(0,4)
             }
-            nearStop[numb] = name
+            subRouteName[numb] = name
         }
-        return nearStop
+        return subRouteName
     }
 
 }
