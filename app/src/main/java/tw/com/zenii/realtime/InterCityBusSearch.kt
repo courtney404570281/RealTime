@@ -11,6 +11,7 @@ import tw.com.zenii.realtime.tracker.TrackerAdapter
 import java.util.*
 import androidx.recyclerview.widget.RecyclerView
 import com.github.brnunes.swipeablerecyclerview.SwipeableRecyclerViewTouchListener
+import com.paulrybitskyi.persistentsearchview.utils.VoiceRecognitionDelegate
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import com.pawegio.kandroid.onQuerySubmit
@@ -28,14 +29,38 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inter_city_bus_search)
 
-        // 在 searchView 內取值
-        search.queryHint = getString(R.string.please_enter_the_route)
+        with(search) {
+            setOnLeftBtnClickListener {
+                // Handle the left button click
+            }
+            setOnClearInputBtnClickListener {
+                // Handle the clear input button click
+            }
 
-        search.onQuerySubmit { query ->
+            // Setting a delegate for the voice recognition input
+            setVoiceRecognitionDelegate(VoiceRecognitionDelegate(this@InterCityBusSearch))
+
+            setOnSearchConfirmedListener { searchView, query ->
+                info { "search: $query" }
+                setSearchRouteId(query)
+                searchRoute(query)
+                // Handle a search confirmation. This is the place where you'd
+                // want to perform a search against your data provider.
+            }
+
+            // Disabling the suggestions since they are unused in
+            // the simple implementation
+            setSuggestionsDisabled(true)
+        }
+
+        // 在 searchView 內取值
+        //search.queryHint = getString(R.string.please_enter_the_route)
+
+        /*search.onQuerySubmit { query ->
             info { "search: $query" }
             setSearchRouteId(query)
             searchRoute(query)
-        }
+        }*/
 
         // 每 5 秒更新一次資料
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
@@ -48,6 +73,14 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        // Calling the voice recognition delegate to properly handle voice input results
+        VoiceRecognitionDelegate.handleResult(search, requestCode, resultCode, data)
+    }
+
+    // 搜尋
     private fun searchRoute(query: String) {
         if (query.isNotEmpty()) {
             val routeNameResults = ArrayList<String>() // 路線名稱
@@ -72,8 +105,8 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
                     if (routeNameResults.isEmpty()) {
                         alert(query + "\t" + getString(R.string.not_found), getString(R.string.message)) {
                             positiveButton(getString(R.string.search_others)) {
-                                search.setQuery("", false)
-                                search.isIconified
+                                //search.setQuery("", false)
+                                //search.isIconified
                             }
                         }.show()
                     }
@@ -106,21 +139,22 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
         }
     }
 
+    // 繪製追蹤清單
     private fun drawTrackerList() {
         GlobalScope.launch {
 
             var trackPlateNumb = ""
-            var trackNearStop = interCityBusHandler.getNearStop(trackPlateNumb!!)[trackPlateNumb]
-            var trackBusStatus = interCityBusHandler.getBusStatus(trackPlateNumb!!)[trackPlateNumb]
-            var trackA2EventType = interCityBusHandler.getA2EventType(trackPlateNumb!!)[trackPlateNumb]
-            var trackRouteName = interCityBusHandler.getSubRouteName(trackPlateNumb!!)[trackPlateNumb]
+            var trackNearStop = interCityBusHandler.getNearStop(trackPlateNumb)[trackPlateNumb]
+            var trackBusStatus = interCityBusHandler.getBusStatus(trackPlateNumb)[trackPlateNumb]
+            var trackA2EventType = interCityBusHandler.getA2EventType(trackPlateNumb)[trackPlateNumb]
+            var trackRouteName = interCityBusHandler.getSubRouteName(trackPlateNumb)[trackPlateNumb]
 
             for (i in 0 until getPlateNumb().size) {
                 trackPlateNumb = getPlateNumb()[i]
-                trackNearStop = interCityBusHandler.getNearStop(trackPlateNumb!!)[trackPlateNumb]
-                trackBusStatus = interCityBusHandler.getBusStatus(trackPlateNumb!!)[trackPlateNumb]
-                trackA2EventType = interCityBusHandler.getA2EventType(trackPlateNumb!!)[trackPlateNumb]
-                trackRouteName = interCityBusHandler.getSubRouteName(trackPlateNumb!!)[trackPlateNumb]
+                trackNearStop = interCityBusHandler.getNearStop(trackPlateNumb)[trackPlateNumb]
+                trackBusStatus = interCityBusHandler.getBusStatus(trackPlateNumb)[trackPlateNumb]
+                trackA2EventType = interCityBusHandler.getA2EventType(trackPlateNumb)[trackPlateNumb]
+                trackRouteName = interCityBusHandler.getSubRouteName(trackPlateNumb)[trackPlateNumb]
             }
 
             info { "Tracker: $trackPlateNumb  $trackNearStop  $trackBusStatus  $trackA2EventType  $trackRouteName" }
