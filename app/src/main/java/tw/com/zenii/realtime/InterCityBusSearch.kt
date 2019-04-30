@@ -29,7 +29,7 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
         setContentView(R.layout.activity_inter_city_bus_search)
 
         // 在 searchView 內取值
-        //search.queryHint = getString(R.string.please_enter_the_route)
+        search.queryHint = getString(R.string.please_enter_the_route)
 
         search.onQuerySubmit { query ->
             info { "search: $query" }
