@@ -7,7 +7,8 @@
         android:weightSum="2"
         tools:context=".MapsActivity"
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:statusBarColor= "@color/colorPrimary">
+        android:statusBarColor= "@color/colorPrimary"
+        android:id="@+id/maps_linear">
 
     <LinearLayout
             android:layout_width="match_parent"

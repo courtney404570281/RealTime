@@ -20,6 +20,12 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.info
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import android.view.ViewAnimationUtils
+import android.animation.Animator
+import android.animation.ObjectAnimator
+import android.view.animation.AnimationUtils
+import kotlinx.android.synthetic.main.activity_maps.*
+
 
 class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
 
@@ -128,6 +134,7 @@ class InterCityBusSearch : AppCompatActivity(), AnkoLogger {
                         // 設定 RouteId 1818
                         setRouteId(route)
                         info { "setRouteId: $route" }
+
                         startActivity(intent)
                         finish()
                     }
